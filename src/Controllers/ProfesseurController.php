@@ -64,10 +64,12 @@ class ProfesseurController {
                 exit;
             }
         } else {
-            $this->model->setId($data['id']);
-            $this->model->setNom($data['nom']);
-            $this->model->setPrenom($data['prenom']);
-            $this->model->setEtablissementId($data['etablissement_id']);
+            // Accès aux propriétés de l'objet avec -> au lieu de ['']
+            $this->model->setId($data->id);
+            $this->model->setNom($data->nom);
+            $this->model->setPrenom($data->prenom);
+            $this->model->setGrade($data->grade);
+            $this->model->setEtablissementId($data->id_etab); // Note: id_etab au lieu de etablissement_id
         }
         $professeur = $this->model;
         $etablissements = $this->model->getAllEtablissements();
