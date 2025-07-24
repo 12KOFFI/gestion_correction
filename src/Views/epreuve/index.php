@@ -28,7 +28,7 @@
                             <td><?= htmlspecialchars($epreuve['type']) ?></td>
                             <td><?= htmlspecialchars($epreuve['id_examen']) ?></td>
                             <td>
-                                <a href="?controller=epreuve&action=edit&id=<?= $epreuve['id'] ?>" class="btn btn-sm btn-warning">Modifier</a>
+                                <a href="?controller=epreuve&action=form&id=<?= $epreuve['id'] ?>" class="btn btn-sm btn-warning">Modifier</a>
                                 <a href="?controller=epreuve&action=delete&id=<?= $epreuve['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer cette épreuve ?')">Supprimer</a>
                             </td>
                         </tr>

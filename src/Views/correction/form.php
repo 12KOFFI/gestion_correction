@@ -8,12 +8,21 @@
             <label for="id_professeur" class="form-label">Professeur</label>
             <select name="id_professeur" id="id_professeur" class="form-select" required>
                 <option value="">-- Sélectionner --</option>
-                <?php foreach ($professeurs as $prof): ?>
-                    <option value="<?= $prof->id ?>"
-                        <?= ($correction && $correction->id_professeur == $prof->id) ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($prof->prenom . ' ' . $prof->nom) ?>
-                    </option>
-                <?php endforeach ?>
+                <?php if (is_array($professeurs)): ?>
+                    <?php foreach ($professeurs as $prof): ?>
+                        <?php 
+                        // Gérer à la fois les tableaux et les objets
+                        $id = is_array($prof) ? ($prof['id'] ?? null) : ($prof->id ?? null);
+                        $prenom = is_array($prof) ? ($prof['prenom'] ?? '') : ($prof->prenom ?? '');
+                        $nom = is_array($prof) ? ($prof['nom'] ?? '') : ($prof->nom ?? '');
+                        $nomComplet = trim("$prenom $nom");
+                        $selected = ($correction && $correction->id_professeur == $id) ? 'selected' : '';
+                        ?>
+                        <option value="<?= htmlspecialchars($id) ?>" <?= $selected ?>>
+                            <?= htmlspecialchars($nomComplet) ?>
+                        </option>
+                    <?php endforeach ?>
+                <?php endif; ?>
             </select>
         </div>
 
@@ -21,12 +30,19 @@
             <label for="id_epreuve" class="form-label">Épreuve</label>
             <select name="id_epreuve" id="id_epreuve" class="form-select" required>
                 <option value="">-- Sélectionner --</option>
-                <?php foreach ($epreuves as $e): ?>
-                    <option value="<?= $e->id ?>"
-                        <?= ($correction && $correction->id_epreuve == $e->id) ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($e->nom) ?>
-                    </option>
-                <?php endforeach ?>
+                <?php if (is_array($epreuves)): ?>
+                    <?php foreach ($epreuves as $e): ?>
+                        <?php 
+                        // Gérer à la fois les tableaux et les objets
+                        $id = is_array($e) ? ($e['id'] ?? null) : ($e->id ?? null);
+                        $nom = is_array($e) ? ($e['nom'] ?? 'Inconnu') : ($e->nom ?? 'Inconnu');
+                        $selected = ($correction && $correction->id_epreuve == $id) ? 'selected' : '';
+                        ?>
+                        <option value="<?= htmlspecialchars($id) ?>" <?= $selected ?>>
+                            <?= htmlspecialchars($nom) ?>
+                        </option>
+                    <?php endforeach ?>
+                <?php endif; ?>
             </select>
         </div>
 

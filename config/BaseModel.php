@@ -19,8 +19,16 @@ abstract class BaseModel {
         foreach ($data as $key => $value) {
             $setter = 'set' . ucfirst($key);
             if (method_exists($this, $setter)) {
+                // Appel du setter s'il existe
                 $this->$setter($value);
+            } elseif (property_exists($this, $key)) {
+                // Définition directe de la propriété si elle existe
+                $this->$key = $value;
+            } else {
+                // Pour le débogage : afficher les propriétés non reconnues
+                error_log("Propriété non reconnue: " . get_class($this) . "->$key");
             }
         }
+        
     }
 }
