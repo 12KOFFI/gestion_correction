@@ -19,9 +19,18 @@ class EpreuveController {
         $epreuve = null;
         $error = null;
         
+        // Créer un objet Epreuve vide ou charger depuis la base de données
+        $epreuveObj = new Epreuve();
+        
         if ($id) {
-            $epreuve = (new Epreuve())->getById($id);
-            if (!$epreuve) {
+            $epreuveData = $epreuveObj->getById($id);
+            if ($epreuveData) {
+                // Copier les données dans l'objet
+                $epreuveObj->id = $epreuveData['id'];
+                $epreuveObj->nom = $epreuveData['nom'];
+                $epreuveObj->type = $epreuveData['type'];
+                $epreuveObj->id_examen = $epreuveData['id_examen'];
+            } else {
                 header('Location: /epreuve');
                 exit;
             }
@@ -29,20 +38,24 @@ class EpreuveController {
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
-                $epreuve = $epreuve ?? new Epreuve();
-                $epreuve->nom = $_POST['nom'] ?? '';
-                $epreuve->type = $_POST['type'] ?? '';
-                $epreuve->id_examen = !empty($_POST['id_examen']) ? (int)$_POST['id_examen'] : null;
+                // Mettre à jour l'objet avec les données du formulaire
+                $epreuveObj->nom = $_POST['nom'] ?? '';
+                $epreuveObj->type = $_POST['type'] ?? '';
+                $epreuveObj->id_examen = !empty($_POST['id_examen']) ? (int)$_POST['id_examen'] : null;
 
                 if ($id) {
-                    $epreuve->id = $id;
-                    $epreuve->update();
+                    $epreuveObj->id = $id;
+                    $success = $epreuveObj->update();
                 } else {
-                    $epreuve->save();
+                    $success = $epreuveObj->save();
                 }
 
-                header('Location: /epreuve');
-                exit;
+                if ($success) {
+                    header('Location: /app?controller=epreuve&action=index');
+                    exit;
+                } else {
+                    $error = "Une erreur est survenue lors de l'enregistrement";
+                }
             } catch (RuntimeException $e) {
                 $error = $e->getMessage();
             }
@@ -51,6 +64,8 @@ class EpreuveController {
         // Récupérer la liste des examens pour le select
         $examens = (new \App\Models\Examen())->getAll();
         
+        // Ne passer l'objet à la vue que si on est en mode édition
+        $epreuve = $id ? $epreuveObj : null;
         require_once __DIR__ . '/../views/epreuve/form.php';
     }
 
@@ -66,7 +81,7 @@ class EpreuveController {
                 $_SESSION['error'] = $e->getMessage();
             }
         }
-        header('Location: /epreuve');
+        header('Location: /app?controller=epreuve&action=index');
         exit;
     }
     
