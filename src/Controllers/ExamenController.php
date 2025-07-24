@@ -29,6 +29,10 @@ class ExamenController {
         require_once __DIR__ . '/../views/examen/form.php';
     }
 
+    public function create() {
+        return $this->new();
+    }
+
     // Affiche le formulaire d'édition et traite la mise à jour
     public function edit() {
         if (!isset($_GET['id'])) {
@@ -58,7 +62,7 @@ class ExamenController {
             header('Location: ?controller=examen&action=index');
             exit;
         }
-        $this->model->id = (int)$_GET['id'];
+        $this->model->setId((int)$_GET['id']);
         $this->model->delete();
         header('Location: ?controller=examen&action=index');
         exit;

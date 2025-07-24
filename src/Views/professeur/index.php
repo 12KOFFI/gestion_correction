@@ -2,7 +2,7 @@
 
 <h1 class="mb-4">Liste des professeurs</h1>
 
-<a href="<?= BASE_URL ?>index.php?controller=professeur&action=new" class="btn btn-success mb-3">Ajouter un professeur</a>
+<a href="?controller=professeur&action=create" class="btn btn-success mb-3">Ajouter un professeur</a>
 
 <?php if (!empty($professeurs)) : ?>
   <table class="table table-striped table-hover align-middle">
@@ -25,8 +25,8 @@
           <td><?= htmlspecialchars($prof->grade) ?></td>
           <td><?= htmlspecialchars($prof->id_etab) ?></td> <!-- Plus tard remplacer par nom établissement -->
           <td>
-            <a href="<?= BASE_URL ?>index.php?controller=professeur&action=edit&id=<?= $prof->id ?>" class="btn btn-sm btn-primary">Modifier</a>
-            <a href="<?= BASE_URL ?>index.php?controller=professeur&action=delete&id=<?= $prof->id ?>" class="btn btn-sm btn-danger" onclick="return confirm('Confirmer la suppression ?')">Supprimer</a>
+            <a href="?controller=professeur&action=edit&id=<?= $prof->id ?>" class="btn btn-sm btn-primary">Modifier</a>
+            <a href="?controller=professeur&action=delete&id=<?= $prof->id ?>" class="btn btn-sm btn-danger" onclick="return confirm('Confirmer la suppression ?')">Supprimer</a>
           </td>
         </tr>
       <?php endforeach; ?>

@@ -26,17 +26,17 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
   <div class="container">
-    <a class="navbar-brand" href="#">Gestion Correction</a>
+    <a class="navbar-brand" href="/app/index.php">Gestion Correction</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="?controller=professeur&action=index">Professeurs</a></li>
-        <li class="nav-item"><a class="nav-link" href="?controller=epreuve&action=index">Épreuves</a></li>
-        <li class="nav-item"><a class="nav-link" href="?controller=correction&action=index">Corrections</a></li>
-        <li class="nav-item"><a class="nav-link" href="?controller=etablissement&action=index">Établissements</a></li>
-        <li class="nav-item"><a class="nav-link" href="?controller=examen&action=index">Examens</a></li>
+        <li class="nav-item"><a class="nav-link" href="/app/index.php?controller=professeur&action=index">Professeurs</a></li>
+        <li class="nav-item"><a class="nav-link" href="/app/index.php?controller=epreuve&action=index">Épreuves</a></li>
+        <li class="nav-item"><a class="nav-link" href="/app/index.php?controller=correction&action=index">Corrections</a></li>
+        <li class="nav-item"><a class="nav-link" href="/app/index.php?controller=etablissement&action=index">Établissements</a></li>
+        <li class="nav-item"><a class="nav-link" href="/app/index.php?controller=examen&action=index">Examens</a></li>
       </ul>
     </div>
   </div>

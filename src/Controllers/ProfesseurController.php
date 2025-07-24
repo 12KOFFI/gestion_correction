@@ -19,46 +19,70 @@ class ProfesseurController {
     // Formulaire + traitement création
     public function new() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->model->formArray($_POST);
-            $this->model->save();
-            header('Location: ?controller=professeur&action=index');
-            exit;
+            $this->model->setNom($_POST['nom']);
+            $this->model->setPrenom($_POST['prenom']);
+            $this->model->setGrade($_POST['grade']);
+            $this->model->setEtablissementId($_POST['etablissement_id']);
+            if ($this->model->save()) {
+                header('Location: index.php?controller=professeur&action=index');
+                exit;
+            }
         }
-        $professeur = null;
+        $professeur = $this->model;
+        $etablissements = $this->model->getAllEtablissements();
         require_once __DIR__ . '/../views/professeur/form.php';
+    }
+
+    // Alias pour new()
+    public function create() {
+        return $this->new();
     }
 
     // Formulaire + traitement modification
     public function edit() {
         if (!isset($_GET['id'])) {
-            header('Location: ?controller=professeur&action=index');
+            header('Location: index.php?controller=professeur&action=index');
+            exit;
+        }
+
+        $id = (int)$_GET['id'];
+        $data = $this->model->getById($id);
+        
+        if (!$data) {
+            header('Location: index.php?controller=professeur&action=index');
             exit;
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->model->formArray($_POST);
-            $this->model->update();
-            header('Location: ?controller=professeur&action=index');
-            exit;
+            $this->model->setId($id);
+            $this->model->setNom($_POST['nom']);
+            $this->model->setPrenom($_POST['prenom']);
+            $this->model->setGrade($_POST['grade']);
+            $this->model->setEtablissementId($_POST['etablissement_id']);
+            if ($this->model->update()) {
+                header('Location: index.php?controller=professeur&action=index');
+                exit;
+            }
+        } else {
+            $this->model->setId($data['id']);
+            $this->model->setNom($data['nom']);
+            $this->model->setPrenom($data['prenom']);
+            $this->model->setEtablissementId($data['etablissement_id']);
         }
-
-        $professeur = $this->model->getById((int)$_GET['id']);
-        if (!$professeur) {
-            header('Location: ?controller=professeur&action=index');
-            exit;
-        }
+        $professeur = $this->model;
+        $etablissements = $this->model->getAllEtablissements();
         require_once __DIR__ . '/../views/professeur/form.php';
     }
 
     // Supprime un professeur
     public function delete() {
         if (!isset($_GET['id'])) {
-            header('Location: ?controller=professeur&action=index');
+            header('Location: index.php?controller=professeur&action=index');
             exit;
         }
-        $this->model->id = (int)$_GET['id'];
+        $this->model->setId((int)$_GET['id']);
         $this->model->delete();
-        header('Location: ?controller=professeur&action=index');
+        header('Location: index.php?controller=professeur&action=index');
         exit;
     }
 }

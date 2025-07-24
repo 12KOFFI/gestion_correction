@@ -25,15 +25,14 @@
   </div>
 
   <div class="mb-3">
-    <label for="id_etab" class="form-label">Établissement</label>
-    <select id="id_etab" name="id_etab" class="form-select" required>
-      <option value="">-- Sélectionnez un établissement --</option>
-      <?php foreach ($etablissements as $etab) : ?>
-        <option value="<?= $etab->id ?>"
-          <?= (isset($professeur->id_etab) && $professeur->id_etab == $etab->id) ? 'selected' : '' ?>>
-          <?= htmlspecialchars($etab->nom) ?>
-        </option>
-      <?php endforeach; ?>
+    <label for="etablissement_id" class="form-label">Établissement</label>
+    <select class="form-control" id="etablissement_id" name="etablissement_id" required>
+        <option value="">Sélectionner un établissement</option>
+        <?php foreach ($etablissements as $etablissement): ?>
+            <option value="<?= $etablissement['id'] ?>" <?= $professeur->getEtablissementId() == $etablissement['id'] ? 'selected' : '' ?>>
+                <?= htmlspecialchars($etablissement['nom']) ?>
+            </option>
+        <?php endforeach; ?>
     </select>
   </div>
 
@@ -41,4 +40,5 @@
   <a href="?controller=professeur&action=index" class="btn btn-secondary">Annuler</a>
 </form>
 
+<?php require_once __DIR__ . '/../layout/footer.php'; ?>
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

@@ -18,34 +18,46 @@ class EtablissementController {
 
     // Formulaire + traitement création
     public function new() {
+        $etablissement = new Etablissement();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->model->formArray($_POST);
-            $this->model->save();
-            header('Location: ?controller=etablissement&action=index');
-            exit;
+            $etablissement->setNom($_POST['nom']);
+            $etablissement->setVille($_POST['ville']);
+            if ($etablissement->save()) {
+                header('Location: index.php?controller=etablissement&action=index');
+                exit;
+            }
         }
-        $etablissement = null;
         require_once __DIR__ . '/../views/etablissement/form.php';
     }
 
     // Formulaire + traitement modification
     public function edit() {
         if (!isset($_GET['id'])) {
-            header('Location: ?controller=etablissement&action=index');
+            header('Location: index.php?controller=etablissement&action=index');
             exit;
         }
 
+        $etablissement = new Etablissement();
+        $id = (int)$_GET['id'];
+        
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->model->formArray($_POST);
-            $this->model->update();
-            header('Location: ?controller=etablissement&action=index');
-            exit;
-        }
-
-        $etablissement = $this->model->getById((int)$_GET['id']);
-        if (!$etablissement) {
-            header('Location: ?controller=etablissement&action=index');
-            exit;
+            $etablissement->setId((int)$_POST['id']);
+            $etablissement->setNom($_POST['nom']);
+            $etablissement->setVille($_POST['ville']);
+            if ($etablissement->update()) {
+                header('Location: index.php?controller=etablissement&action=index');
+                exit;
+            }
+        } else {
+            $data = $etablissement->getById($id);
+            if ($data) {
+                $etablissement->setId($data['id']);
+                $etablissement->setNom($data['nom']);
+                $etablissement->setVille($data['ville']);
+            } else {
+                header('Location: index.php?controller=etablissement&action=index');
+                exit;
+            }
         }
         require_once __DIR__ . '/../views/etablissement/form.php';
     }
@@ -56,7 +68,7 @@ class EtablissementController {
             header('Location: ?controller=etablissement&action=index');
             exit;
         }
-        $this->model->id = (int)$_GET['id'];
+        $this->model->setId((int)$_GET['id']);
         $this->model->delete();
         header('Location: ?controller=etablissement&action=index');
         exit;

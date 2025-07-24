@@ -11,7 +11,7 @@ class Professeur extends BaseModel {
     public string $nom;
     public string $prenom;
     public string $grade;
-    public ?int $id_etab = null;
+    protected ?int $id_etab = null;  // Changé de etablissement_id à id_etab
 
     // Récupérer tous les professeurs
     public function getAll(): array {
@@ -26,32 +26,53 @@ class Professeur extends BaseModel {
         return $stmt->fetch();
     }
 
+    // Récupérer tous les établissements
+    public function getAllEtablissements(): array {
+        $sql = "SELECT * FROM etablissement ORDER BY nom";
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     // Enregistrer un nouveau professeur
     public function save(): bool {
-        $sql = "INSERT INTO {$this->table} (nom, prenom, grade, id_etab)
-                VALUES (:nom, :prenom, :grade, :id_etab)";
+        $fields = ['nom', 'prenom', 'grade'];
+        $values = [
+            'nom' => $this->nom,
+            'prenom' => $this->prenom,
+            'grade' => $this->grade
+        ];
+        
+        if ($this->id_etab !== null) {
+            $fields[] = 'id_etab';
+            $values['id_etab'] = $this->id_etab;
+        }
+        
+        $sql = "INSERT INTO {$this->table} (" . implode(', ', $fields) . ") 
+                VALUES (:" . implode(', :', $fields) . ")";
         $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            'nom'     => $this->nom,
-            'prenom'  => $this->prenom,
-            'grade'   => $this->grade,
-            'id_etab' => $this->id_etab
-        ]);
+        return $stmt->execute($values);
     }
 
     // Mettre à jour un professeur
     public function update(): bool {
-        $sql = "UPDATE {$this->table}
-                SET nom = :nom, prenom = :prenom, grade = :grade, id_etab = :id_etab
+        $fields = ['nom = :nom', 'prenom = :prenom', 'grade = :grade'];
+        $values = [
+            'id' => $this->id,
+            'nom' => $this->nom,
+            'prenom' => $this->prenom,
+            'grade' => $this->grade
+        ];
+        
+        if ($this->id_etab !== null) {
+            $fields[] = 'id_etab = :id_etab';
+            $values['id_etab'] = $this->id_etab;
+        }
+        
+        $sql = "UPDATE {$this->table} 
+                SET " . implode(', ', $fields) . " 
                 WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            'nom'     => $this->nom,
-            'prenom'  => $this->prenom,
-            'grade'   => $this->grade,
-            'id_etab' => $this->id_etab,
-            'id'      => $this->id
-        ]);
+        return $stmt->execute($values);
     }
 
     // Supprimer un professeur
@@ -59,4 +80,47 @@ class Professeur extends BaseModel {
         $stmt = $this->pdo->prepare("DELETE FROM {$this->table} WHERE id = ?");
         return $stmt->execute([$this->id]);
     }
+
+    // Getters
+    public function getId(): ?int {
+        return $this->id;
+    }
+
+    public function getNom(): string {
+        return $this->nom;
+    }
+
+    public function getPrenom(): string {
+        return $this->prenom;
+    }
+
+    public function getGrade(): string {
+        return $this->grade;
+    }
+
+    public function getEtablissementId(): ?int {
+        return $this->id_etab;
+    }
+
+    // Setters
+    public function setId(?int $id): void {
+        $this->id = $id;
+    }
+
+    public function setNom(string $nom): void {
+        $this->nom = $nom;
+    }
+
+    public function setPrenom(string $prenom): void {
+        $this->prenom = $prenom;
+    }
+
+    public function setGrade(string $grade): void {
+        $this->grade = $grade;
+    }
+
+    public function setEtablissementId(?int $id_etab): void {
+        $this->id_etab = $id_etab;
+    }
 }
+

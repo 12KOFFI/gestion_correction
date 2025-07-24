@@ -14,7 +14,7 @@
                     <i class="bi bi-people-fill fs-1 text-primary mb-3"></i>
                     <h5 class="card-title">Gestion des Professeurs</h5>
                     <p class="card-text text-muted">Ajoutez, modifiez et supprimez les professeurs.</p>
-                    <a href="?controller=professeur&action=index" class="btn btn-primary">Accéder</a>
+                    <a href="/app/index.php?controller=professeur&action=index" class="btn btn-primary">Accéder</a>
                 </div>
             </div>
         </div>
@@ -25,7 +25,7 @@
                     <i class="bi bi-journal-text fs-1 text-success mb-3"></i>
                     <h5 class="card-title">Gestion des Examens</h5>
                     <p class="card-text text-muted">Organisez vos examens et matières facilement.</p>
-                    <a href="?controller=examen&action=index" class="btn btn-success">Accéder</a>
+                    <a href="/app/index.php?controller=examen&action=index" class="btn btn-success">Accéder</a>
                 </div>
             </div>
         </div>
@@ -36,7 +36,7 @@
                     <i class="bi bi-file-earmark-text fs-1 text-warning mb-3"></i>
                     <h5 class="card-title">Gestion des Épreuves</h5>
                     <p class="card-text text-muted">Suivez les différentes épreuves associées aux examens.</p>
-                    <a href="?controller=epreuve&action=index" class="btn btn-warning">Accéder</a>
+                    <a href="/app/index.php?controller=epreuve&action=index" class="btn btn-warning">Accéder</a>
                 </div>
             </div>
         </div>
@@ -49,7 +49,7 @@
                     <i class="bi bi-building fs-1 text-info mb-3"></i>
                     <h5 class="card-title">Gestion des Établissements</h5>
                     <p class="card-text text-muted">Gérez vos établissements scolaires et leurs villes.</p>
-                    <a href="?controller=etablissement&action=index" class="btn btn-info text-white">Accéder</a>
+                    <a href="/app/index.php?controller=etablissement&action=index" class="btn btn-info text-white">Accéder</a>
                 </div>
             </div>
         </div>
@@ -60,7 +60,7 @@
                     <i class="bi bi-pencil-square fs-1 text-danger mb-3"></i>
                     <h5 class="card-title">Gestion des Corrections</h5>
                     <p class="card-text text-muted">Suivez le processus de correction des copies.</p>
-                    <a href="?controller=correction&action=index" class="btn btn-danger">Accéder</a>
+                    <a href="/app/index.php?controller=correction&action=index" class="btn btn-danger">Accéder</a>
                 </div>
             </div>
         </div>

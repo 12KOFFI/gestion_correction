@@ -15,12 +15,12 @@ abstract class BaseModel {
         return get_object_vars($this);
     }
 
-    public function formArray(array $data): self {
+    public function formArray(array $data): void {
         foreach ($data as $key => $value) {
-            if (property_exists($this, $key)) {
-                $this->{$key} = $value;
+            $setter = 'set' . ucfirst($key);
+            if (method_exists($this, $setter)) {
+                $this->$setter($value);
             }
         }
-        return $this;
     }
 }
