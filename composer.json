@@ -1,0 +1,17 @@
+{
+    "name": "slim3/app",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/",
+           "Config\\": "config/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Isaac",
+            "email": "isaacndri5@gmail.com"
+        }
+    ],
+    "require": {}
+}
+ 
