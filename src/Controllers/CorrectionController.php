@@ -35,25 +35,35 @@ class CorrectionController {
 
     // Formulaire + traitement modification
     public function edit() {
-        $professeurs = (new Professeur())->getAll();
-        $epreuves = (new Epreuve())->getAll();
-
         if (!isset($_GET['id'])) {
             header('Location: ?controller=correction&action=index');
             exit;
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->model->formArray($_POST);
-            $this->model->update();
-            header('Location: ?controller=correction&action=index');
-            exit;
-        }
-
+        // Charger d'abord la correction existante
         $correction = $this->model->getById((int)$_GET['id']);
         if (!$correction) {
             header('Location: ?controller=correction&action=index');
             exit;
+        }
+
+        // Récupérer les listes pour les menus déroulants
+        $professeurs = (new Professeur())->getAll();
+        $epreuves = (new Epreuve())->getAll();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Mettre à jour les propriétés avec les données du formulaire
+            $this->model->formArray($_POST);
+            // Forcer l'ID de la correction à mettre à jour
+            $this->model->id = (int)$_GET['id'];
+            
+            if ($this->model->update()) {
+                header('Location: ?controller=correction&action=index');
+                exit;
+            } else {
+                // En cas d'erreur, recharger la vue avec les données
+                $error = "Erreur lors de la mise à jour de la correction";
+            }
         }
         require_once __DIR__ . '/../views/correction/form.php';
     }

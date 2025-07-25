@@ -78,7 +78,7 @@ class EpreuveController {
                     $error = "Une erreur est survenue lors de l'enregistrement";
                 }
             } catch (RuntimeException $e) {
-                $error = $e->getMessage();
+               $error = $e->getMessage();
             }
         }
 
@@ -98,7 +98,7 @@ class EpreuveController {
         $viewData = [
             'epreuve' => $epreuve,
             'examens' => $examens,
-            'error' => $error
+            'error' =>  $error
         ];
         
         // Debug des données transmises à la vue

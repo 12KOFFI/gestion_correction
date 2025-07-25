@@ -12,12 +12,12 @@ abstract class BaseModel {
     }
 
     public function toArray(): array {
-        return get_object_vars($this);
+        return get_object_vars($this); // Retourne un tableau associatif des propriétés de l'objet
     }
 
     public function formArray(array $data): void {
         foreach ($data as $key => $value) {
-            $setter = 'set' . ucfirst($key);
+            $setter = 'set' . ucfirst($key); // Convertit le nom de la clé en setter
             if (method_exists($this, $setter)) {
                 // Appel du setter s'il existe
                 $this->$setter($value);

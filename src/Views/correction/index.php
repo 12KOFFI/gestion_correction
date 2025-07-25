@@ -39,6 +39,9 @@
     <a href="/app/index.php?controller=epreuve&action=index" class="btn btn-outline-secondary">
         <i class="bi bi-arrow-left"></i> Précédent: Épreuves
     </a>
+    <a href="/app/index.php" class="btn btn-outline-primary">
+        <i class="bi bi-house-door"></i> Page d'accueil
+    </a>
 </div>
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

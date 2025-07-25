@@ -2,10 +2,9 @@
 namespace App\Models;
 use Config\BaseModel;
 
-use PDO;
 
 class Correction extends BaseModel {
-    public int $id;
+    public ?int $id = null;
     public ?int $id_professeur = null;
     public ?int $id_epreuve = null;
     public ?string $date = null;
