@@ -35,4 +35,10 @@
     </table>
 </div>
 
+<div class="d-flex justify-content-between mt-4">
+    <a href="/app/index.php?controller=epreuve&action=index" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Précédent: Épreuves
+    </a>
+</div>
+
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

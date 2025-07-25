@@ -75,9 +75,31 @@ class Etablissement extends BaseModel {
         ]);
     }
 
-    // Supprimer un établissement
+    // Supprimer un établissement et ses professeurs associés
     public function delete(): bool {
-        $stmt = $this->pdo->prepare("DELETE FROM {$this->table} WHERE id = ?");
-        return $stmt->execute([$this->id]);
+        try {
+            // Démarrer une transaction
+            $this->pdo->beginTransaction();
+            
+            // 1. D'abord, supprimer tous les professeurs liés à cet établissement
+            $stmt = $this->pdo->prepare("DELETE FROM professeur WHERE id_etab = ?");
+            $stmt->execute([$this->id]);
+            
+            // 2. Ensuite, supprimer l'établissement
+            $stmt = $this->pdo->prepare("DELETE FROM {$this->table} WHERE id = ?");
+            $result = $stmt->execute([$this->id]);
+            
+            // Valider la transaction si tout s'est bien passé
+            $this->pdo->commit();
+            return $result;
+            
+        } catch (\PDOException $e) {
+            // En cas d'erreur, annuler la transaction
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            // Relancer l'exception pour qu'elle soit gérée par le contrôleur
+            throw $e;
+        }
     }
 }

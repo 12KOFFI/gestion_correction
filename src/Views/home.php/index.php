@@ -8,6 +8,18 @@
     </div>
 
     <div class="row justify-content-center g-4">
+
+    <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-building fs-1 text-info mb-3"></i>
+                    <h5 class="card-title">Gestion des Établissements</h5>
+                    <p class="card-text text-muted">Gérez vos établissements scolaires et leurs villes.</p>
+                    <a href="/app/index.php?controller=etablissement&action=index" class="btn btn-info text-white">Accéder</a>
+                </div>
+            </div>
+        </div>
+
         <div class="col-md-4">
             <div class="card shadow-sm h-100">
                 <div class="card-body text-center">
@@ -30,7 +42,8 @@
             </div>
         </div>
 
-        <div class="col-md-4">
+    <div class="row justify-content-center g-4 mt-4">
+    <div class="col-md-4">
             <div class="card shadow-sm h-100">
                 <div class="card-body text-center">
                     <i class="bi bi-file-earmark-text fs-1 text-warning mb-3"></i>
@@ -40,20 +53,7 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="row justify-content-center g-4 mt-4">
-        <div class="col-md-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body text-center">
-                    <i class="bi bi-building fs-1 text-info mb-3"></i>
-                    <h5 class="card-title">Gestion des Établissements</h5>
-                    <p class="card-text text-muted">Gérez vos établissements scolaires et leurs villes.</p>
-                    <a href="/app/index.php?controller=etablissement&action=index" class="btn btn-info text-white">Accéder</a>
-                </div>
-            </div>
-        </div>
-
+   
         <div class="col-md-4">
             <div class="card shadow-sm h-100">
                 <div class="card-body text-center">

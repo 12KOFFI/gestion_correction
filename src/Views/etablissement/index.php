@@ -32,4 +32,13 @@
   <div class="alert alert-info">Aucun établissement trouvé.</div>
 <?php endif; ?>
 
+<div class="d-flex justify-content-between mt-4">
+    <a href="/app/index.php" class="btn btn-outline-secondary">
+        <i class="bi bi-house-door"></i> Retour à l'accueil
+    </a>
+    <a href="/app/index.php?controller=professeur&action=index" class="btn btn-primary">
+        Suivant: Gestion des Professeurs <i class="bi bi-arrow-right"></i>
+    </a>
+</div>
+
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

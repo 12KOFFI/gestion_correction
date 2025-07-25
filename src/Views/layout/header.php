@@ -32,11 +32,12 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
+      <li class="nav-item"><a class="nav-link" href="/app/index.php?controller=etablissement&action=index">Établissements</a></li>
         <li class="nav-item"><a class="nav-link" href="/app/index.php?controller=professeur&action=index">Professeurs</a></li>
+        <li class="nav-item"><a class="nav-link" href="/app/index.php?controller=examen&action=index">Examens</a></li>
         <li class="nav-item"><a class="nav-link" href="/app/index.php?controller=epreuve&action=index">Épreuves</a></li>
         <li class="nav-item"><a class="nav-link" href="/app/index.php?controller=correction&action=index">Corrections</a></li>
-        <li class="nav-item"><a class="nav-link" href="/app/index.php?controller=etablissement&action=index">Établissements</a></li>
-        <li class="nav-item"><a class="nav-link" href="/app/index.php?controller=examen&action=index">Examens</a></li>
+        
       </ul>
     </div>
   </div>

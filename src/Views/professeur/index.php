@@ -36,4 +36,13 @@
   <div class="alert alert-info">Aucun professeur trouvé.</div>
 <?php endif; ?>
 
+<div class="d-flex justify-content-between mt-4">
+    <a href="/app/index.php?controller=etablissement&action=index" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Précédent: Établissements
+    </a>
+    <a href="/app/index.php?controller=examen&action=index" class="btn btn-primary">
+        Suivant: Gestion des Examens <i class="bi bi-arrow-right"></i>
+    </a>
+</div>
+
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
