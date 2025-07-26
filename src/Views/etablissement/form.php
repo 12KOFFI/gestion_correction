@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         // Redirection vers la liste avec message de succès
-        header('Location: ?controller=etablissement&action=index&message=' . urlencode($message));
+        header('Location: index.php?message=' . urlencode($message));
         exit();
         
     } catch (Exception $e) {
@@ -82,7 +82,7 @@ if (!empty($error)) {
             <button type="submit" class="btn btn-primary">
                 <i class="bi bi-save"></i> <?= $isEdit ? 'Mettre à jour' : 'Enregistrer' ?>
             </button>
-            <a href="index.php?controller=etablissement&action=index" class="btn btn-outline-secondary">
+            <a href="index.php" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> Retour à la liste
             </a>
         </div>

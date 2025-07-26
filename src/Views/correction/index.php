@@ -8,6 +8,17 @@ use App\Controllers\CorrectionController;
 // Initialisation
 $correctionController = new CorrectionController();
 
+// Traitement de la suppression
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete' && isset($_POST['id'])) {
+    $id = (int)$_POST['id'];
+    if ($correctionController->delete($id)) {
+        header('Location: index.php?message=' . urlencode('Correction supprimée avec succès'));
+        exit();
+    } else {
+        $error = 'Impossible de supprimer la correction';
+    }
+}
+
 // Récupération des corrections
 try {
     $corrections = $correctionController->index();
@@ -69,9 +80,13 @@ require_once __DIR__ . '/../layout/header.php';
                         <a href="form.php?id=<?= $correction->getId() ?>" class="btn btn-sm btn-warning">
                             <i class="bi bi-pencil"></i> Modifier
                         </a>
-                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete(<?= $correction->getId() ?>)">
-                            <i class="bi bi-trash"></i> Supprimer
-                        </button>
+                        <form method="POST" action="index.php" style="display: inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette correction ?')">
+                            <input type="hidden" name="id" value="<?= $correction->getId() ?>">
+                            <input type="hidden" name="action" value="delete">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i> Supprimer
+                            </button>
+                        </form>
                     </td>
                 </tr>
             <?php endforeach ?>
@@ -90,10 +105,4 @@ require_once __DIR__ . '/../layout/header.php';
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>
 
-<script>
-function confirmDelete(id) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette correction ?')) {
-        window.location.href = 'delete.php?id=' + id;
-    }
-}
-</script>
+

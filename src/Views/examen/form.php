@@ -94,7 +94,7 @@ require_once __DIR__ . '/../layout/header.php'; ?>
                         </div>
 
                         <div class="d-flex justify-content-between mt-4">
-                            <a href="?controller=examen&action=index" class="btn btn-outline-secondary">
+                            <a href="index.php" class="btn btn-outline-secondary">
                                 <i class="bi bi-arrow-left"></i> Retour à la liste
                             </a>
                             <button type="submit" class="btn btn-primary">

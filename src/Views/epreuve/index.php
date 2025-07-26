@@ -10,6 +10,17 @@ use App\Models\Epreuve;
 // Initialisation
 $controller = new EpreuveController();
 
+// Traitement de la suppression
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete' && isset($_POST['id'])) {
+    $id = (int)$_POST['id'];
+    if ($controller->delete($id)) {
+        header('Location: index.php?message=' . urlencode('Épreuve supprimée avec succès'));
+    } else {
+        header('Location: index.php?error=' . urlencode('Impossible de supprimer l\'épreuve car elle est liée à des corrections'));
+    }
+    exit();
+}
+
 // Récupération de la liste
 $epreuves = $controller->index();
 
@@ -59,11 +70,13 @@ require_once __DIR__ . '/../layout/header.php';
                                    title="Modifier cette épreuve">
                                     <i class="bi bi-pencil"></i> Modifier
                                 </a>
-                                <a href="?controller=epreuve&action=delete&id=<?= $epreuve->getId() ?>" 
-                                   class="btn btn-sm btn-danger" 
-                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette épreuve ?')">
-                                    <i class="bi bi-trash"></i> Supprimer
-                                </a>
+                                <form method="POST" action="index.php" style="display: inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette épreuve ?')">
+                                    <input type="hidden" name="id" value="<?= $epreuve->getId() ?>">
+                                    <input type="hidden" name="action" value="delete">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash"></i> Supprimer
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>

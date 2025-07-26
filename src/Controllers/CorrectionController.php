@@ -17,9 +17,6 @@ class CorrectionController {
     
     /**
      * Récupère une correction par son ID
-     * 
-     * @param int $id L'ID de la correction à récupérer
-     * @return Correction|null Retourne l'objet Correction ou null si non trouvé
      */
     public function getById(int $id): ?Correction {
         return $this->correctionRepository->getById($id);
