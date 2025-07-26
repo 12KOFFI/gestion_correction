@@ -91,6 +91,11 @@
           </a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" href="/app/src/Views/etablissement/index.php">
+            <i class="bi bi-person-video3 me-1"></i> Etablissements
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" href="/app/src/Views/professeur/index.php">
             <i class="bi bi-person-video3 me-1"></i> Professeurs
           </a>

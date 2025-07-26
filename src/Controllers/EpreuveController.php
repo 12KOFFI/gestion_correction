@@ -17,9 +17,6 @@ class EpreuveController {
     
     /**
      * Récupère une épreuve par son ID
-     * 
-     * @param int $id L'ID de l'épreuve à récupérer
-     * @return Epreuve|null Retourne l'objet Epreuve ou null si non trouvé
      */
     public function getById(int $id): ?Epreuve {
         return $this->epreuveRepository->getById($id);
@@ -27,17 +24,6 @@ class EpreuveController {
 
     // 1. Lister toutes les épreuves
     public function index(): array {
-        // Debug: Vérifier la connexion à la base de données
-        if (!$this->pdo) {
-            throw new \Exception("Erreur de connexion à la base de données");
-        }
-
-        // Debug: Vérifier si la table existe
-        $tableExists = $this->pdo->query("SHOW TABLES LIKE 'epreuve'")->rowCount() > 0;
-        if (!$tableExists) {
-            throw new \Exception("La table 'epreuve' n'existe pas dans la base de données");
-        }
-
         // Récupérer les épreuves
         $stmt = $this->pdo->query("SELECT * FROM epreuve");
         if ($stmt === false) {
