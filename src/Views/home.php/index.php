@@ -1,4 +1,10 @@
-<?php require_once __DIR__ . '/../layout/header.php'; ?>
+<?php 
+// Chargement de l'autoloader Composer
+require_once __DIR__ . '/../../../vendor/autoload.php';
+
+// Inclusion du header
+require_once __DIR__ . '/../layout/header.php'; 
+?>
 
 <div class="container py-5">
     <div class="text-center mb-5">
@@ -8,14 +14,15 @@
     </div>
 
     <div class="row justify-content-center g-4">
-
-    <div class="col-md-4">
+        <div class="col-md-4">
             <div class="card shadow-sm h-100">
                 <div class="card-body text-center">
                     <i class="bi bi-building fs-1 text-info mb-3"></i>
                     <h5 class="card-title">Gestion des Établissements</h5>
                     <p class="card-text text-muted">Gérez vos établissements scolaires et leurs villes.</p>
-                    <a href="/app/index.php?controller=etablissement&action=index" class="btn btn-info text-white">Accéder</a>
+                    <a href="/app/src/Views/etablissement/index.php" class="btn btn-info text-white">
+                        <i class="bi bi-arrow-right-circle"></i> Accéder
+                    </a>
                 </div>
             </div>
         </div>
@@ -26,7 +33,9 @@
                     <i class="bi bi-people-fill fs-1 text-primary mb-3"></i>
                     <h5 class="card-title">Gestion des Professeurs</h5>
                     <p class="card-text text-muted">Ajoutez, modifiez et supprimez les professeurs.</p>
-                    <a href="/app/index.php?controller=professeur&action=index" class="btn btn-primary">Accéder</a>
+                    <a href="/app/src/Views/professeur/index.php" class="btn btn-primary">
+                        <i class="bi bi-arrow-right-circle"></i> Accéder
+                    </a>
                 </div>
             </div>
         </div>
@@ -37,34 +46,43 @@
                     <i class="bi bi-journal-text fs-1 text-success mb-3"></i>
                     <h5 class="card-title">Gestion des Examens</h5>
                     <p class="card-text text-muted">Organisez vos examens et matières facilement.</p>
-                    <a href="/app/index.php?controller=examen&action=index" class="btn btn-success">Accéder</a>
+                    <a href="/app/src/Views/examen/index.php" class="btn btn-success">
+                        <i class="bi bi-arrow-right-circle"></i> Accéder
+                    </a>
                 </div>
             </div>
         </div>
 
     <div class="row justify-content-center g-4 mt-4">
-    <div class="col-md-4">
+        <div class="col-md-4">
             <div class="card shadow-sm h-100">
                 <div class="card-body text-center">
                     <i class="bi bi-file-earmark-text fs-1 text-warning mb-3"></i>
                     <h5 class="card-title">Gestion des Épreuves</h5>
-                    <p class="card-text text-muted">Suivez les différentes épreuves associées aux examens.</p>
-                    <a href="/app/index.php?controller=epreuve&action=index" class="btn btn-warning">Accéder</a>
+                    <p class="card-text text-muted">Créez et gérez les épreuves d'examen.</p>
+                    <a href="/app/src/Views/epreuve/index.php" class="btn btn-warning text-white">
+                        <i class="bi bi-arrow-right-circle"></i> Accéder
+                    </a>
                 </div>
             </div>
         </div>
-   
+
         <div class="col-md-4">
             <div class="card shadow-sm h-100">
                 <div class="card-body text-center">
-                    <i class="bi bi-pencil-square fs-1 text-danger mb-3"></i>
+                    <i class="bi bi-check2-square fs-1 text-danger mb-3"></i>
                     <h5 class="card-title">Gestion des Corrections</h5>
-                    <p class="card-text text-muted">Suivez le processus de correction des copies.</p>
-                    <a href="/app/index.php?controller=correction&action=index" class="btn btn-danger">Accéder</a>
+                    <p class="card-text text-muted">Suivez l'avancement des corrections.</p>
+                    <a href="/app/src/Views/correction/index.php" class="btn btn-danger">
+                        <i class="bi bi-arrow-right-circle"></i> Accéder
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<?php require_once __DIR__ . '/../layout/footer.php'; ?>
+<?php 
+// Inclusion du footer
+require_once __DIR__ . '/../layout/footer.php'; 
+?>

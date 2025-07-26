@@ -1,12 +1,65 @@
-<?php require_once __DIR__ . '/../layout/header.php'; ?>
-
 <?php
-  $isEdit = isset($etablissement) && $etablissement->getId() !== null;
-  $action = $isEdit ? 'edit' : 'new';
-  $title = $isEdit ? 'Modifier un établissement' : 'Ajouter un établissement';
+// Chargement de l'autoloader Composer
+require_once __DIR__ . '/../../../vendor/autoload.php';
+
+// Importation des classes nécessaires
+use App\Config\Database;
+use App\Controllers\EtablissementController;
+use App\Models\Etablissement;
+
+// Initialisation
+$controller = new EtablissementController();
+$etablissement = new Etablissement(null, '', '');
+$isEdit = false;
+$error = '';
+
+// Traitement du formulaire
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id = isset($_POST['id']) ? (int)$_POST['id'] : null;
+    $nom = trim($_POST['nom'] ?? '');
+    $ville = trim($_POST['ville'] ?? '');
+    
+    try {
+        $etablissement = new Etablissement($id, $nom, $ville);
+        
+        // Création ou mise à jour
+        if ($id) {
+            $controller->edit($id, $etablissement);
+            $message = 'Établissement mis à jour avec succès';
+        } else {
+            $controller->new($etablissement);
+            $message = 'Établissement créé avec succès';
+        }
+        
+        // Redirection vers la liste avec message de succès
+        header('Location: ?controller=etablissement&action=index&message=' . urlencode($message));
+        exit();
+        
+    } catch (Exception $e) {
+        $error = 'Une erreur est survenue : ' . $e->getMessage();
+    }
+}
+
+// Chargement des données si édition
+if (isset($_GET['id'])) {
+    $etablissement = $controller->getById((int)$_GET['id']);
+    $isEdit = true;
+}
+
+// Configuration de la page
+$pageTitle = $isEdit ? 'Modifier un établissement' : 'Ajouter un établissement';
+
+// En-tête
+require_once __DIR__ . '/../layout/header.php';
+
+// Affichage des messages
+if (!empty($error)) {
+    echo '<div class="alert alert-danger">' . htmlspecialchars($error) . '</div>';
+}
 ?>
 
-<h1 class="mb-4"><?= $title ?></h1>
+<div class="container">
+    <h1 class="mb-4"><?= $pageTitle ?></h1>
 
 <form method="post">
   <?php if ($isEdit): ?>
@@ -25,8 +78,15 @@
            value="<?= htmlspecialchars($etablissement->getVille()) ?>" required>
   </div>
 
-  <button type="submit" class="btn btn-primary"><?= $isEdit ? 'Mettre à jour' : 'Enregistrer' ?></button>
-  <a href="index.php?controller=etablissement&action=index" class="btn btn-secondary">Annuler</a>
-</form>
+          <div class="form-group mt-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save"></i> <?= $isEdit ? 'Mettre à jour' : 'Enregistrer' ?>
+            </button>
+            <a href="index.php?controller=etablissement&action=index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Retour à la liste
+            </a>
+        </div>
+    </form>
+</div> <!-- Fin du container -->
 
 <?php require_once __DIR__ . '/../layout/footer.php'; ?>

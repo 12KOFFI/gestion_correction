@@ -1,48 +1,122 @@
-<?php require_once __DIR__ . '/../layout/header.php'; ?>
+<?php
+// Chargement de l'autoloader Composer
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
-<h1 class="mb-4">Liste des professeurs</h1>
+// Importation des classes nécessaires
+use App\Controllers\ProfesseurController;
+use App\Models\Professeur;
 
-<a href="?controller=professeur&action=create" class="btn btn-success mb-3">Ajouter un professeur</a>
+// Initialisation du contrôleur
+$controller = new ProfesseurController();
 
-<?php if (!empty($professeurs)) : ?>
-  <table class="table table-striped table-hover align-middle">
-    <thead class="table-primary">
-      <tr>
-        <th>ID</th>
-        <th>Nom</th>
-        <th>Prénom</th>
-        <th>Grade</th>
-        <th>Établissement</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php foreach ($professeurs as $prof) : ?>
-        <tr>
-          <td><?= htmlspecialchars($prof->id) ?></td>
-          <td><?= htmlspecialchars($prof->nom) ?></td>
-          <td><?= htmlspecialchars($prof->prenom) ?></td>
-          <td><?= htmlspecialchars($prof->grade) ?></td>
-          <td><?= htmlspecialchars($prof->id_etab) ?></td> <!-- Plus tard remplacer par nom établissement -->
-          <td>
-            <a href="?controller=professeur&action=edit&id=<?= $prof->id ?>" class="btn btn-sm btn-primary">Modifier</a>
-            <a href="?controller=professeur&action=delete&id=<?= $prof->id ?>" class="btn btn-sm btn-danger" onclick="return confirm('Confirmer la suppression ?')">Supprimer</a>
-          </td>
-        </tr>
-      <?php endforeach; ?>
-    </tbody>
-  </table>
-<?php else : ?>
-  <div class="alert alert-info">Aucun professeur trouvé.</div>
-<?php endif; ?>
+// Traitement des actions
+if (isset($_GET['action'])) {
+    switch ($_GET['action']) {
+        case 'delete':
+            if (isset($_GET['id'])) {
+                $_GET['id'] = (int)$_GET['id'];
+                if ($controller->delete()) {
+                    header('Location: index.php?message=' . urlencode('Professeur supprimé avec succès'));
+                } else {
+                    header('Location: index.php?error=' . urlencode('Impossible de supprimer le professeur car il est lié à des données'));
+                }
+                exit();
+            }
+            break;
+    }
+}
 
-<div class="d-flex justify-content-between mt-4">
-    <a href="/app/index.php?controller=etablissement&action=index" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left"></i> Précédent: Établissements
-    </a>
-    <a href="/app/index.php?controller=examen&action=index" class="btn btn-primary">
-        Suivant: Gestion des Examens <i class="bi bi-arrow-right"></i>
-    </a>
+// Récupération de la liste des professeurs
+$professeurs = $controller->index();
+
+// Inclusion du header
+require_once __DIR__ . '/../layout/header.php';
+?>
+
+<div class="container py-4">
+    <!-- Affichage des messages -->
+    <?php if (isset($_GET['message'])) : ?>
+        <div class="alert alert-success"><?= htmlspecialchars(urldecode($_GET['message'])) ?></div>
+    <?php endif; ?>
+    
+    <?php if (isset($_GET['error'])) : ?>
+        <div class="alert alert-danger"><?= htmlspecialchars(urldecode($_GET['error'])) ?></div>
+    <?php endif; ?>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Liste des professeurs</h1>
+        <a href="form.php" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Ajouter un professeur
+        </a>
+    </div>
+
+    <?php if (!empty($professeurs)) : ?>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-primary">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Grade</th>
+                        <th>Établissement</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($professeurs as $prof) : ?>
+                        <tr>
+                            <td><?= htmlspecialchars($prof->getId()) ?></td>
+                            <td><?= htmlspecialchars($prof->getNom()) ?></td>
+                            <td><?= htmlspecialchars($prof->getPrenom()) ?></td>
+                            <td><?= htmlspecialchars($prof->getGrade()) ?></td>
+                            <td>
+                                <?php 
+                                $etablissementId = $prof->getEtablissementId();
+                                $etablissement = null;
+                                if ($etablissementId) {
+                                    $etablissementController = new \App\Controllers\EtablissementController();
+                                    $etablissements = $etablissementController->index();
+                                    foreach ($etablissements as $etab) {
+                                        if ($etab->getId() === $etablissementId) {
+                                            $etablissement = $etab;
+                                            break;
+                                        }
+                                    }
+                                }
+                                echo htmlspecialchars($etablissement ? $etablissement->getNom() : 'Non défini');
+                                ?>
+                            </td>
+                            <td class="text-end">
+                                <a href="form.php?id=<?= $prof->getId() ?>" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i> Modifier
+                                </a>
+                                <a href="index.php?action=delete&id=<?= $prof->getId() ?>" 
+                                   class="btn btn-sm btn-danger" 
+                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce professeur ?')">
+                                    <i class="bi bi-trash"></i> Supprimer
+                                </a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    <?php else : ?>
+        <div class="alert alert-info">Aucun professeur trouvé.</div>
+    <?php endif; ?>
+
+    <div class="d-flex justify-content-between mt-4">
+        <a href="/app/src/Views/etablissement/index.php" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Précédent: Établissements
+        </a>
+        <a href="/app/src/Views/examen/index.php" class="btn btn-primary">
+            Suivant: Gestion des Examens <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
 </div>
 
-<?php require_once __DIR__ . '/../layout/footer.php'; ?>
+<?php 
+// Inclusion du footer
+require_once __DIR__ . '/../layout/footer.php'; 
+?>

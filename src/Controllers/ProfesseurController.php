@@ -1,90 +1,102 @@
 <?php
 namespace App\Controllers;
 
+use Config\Database;
 use App\Models\Professeur;
+use App\Repository\ProfesseurRepository;
+use PDO;
 
 class ProfesseurController {
-    protected Professeur $model;
+    private $pdo;
+    private $professeurRepository;
 
     public function __construct() {
-        $this->model = new Professeur();
+        $this->pdo = Database::getConnection();
+        $this->professeurRepository = new ProfesseurRepository();
     }
 
-    // Liste tous les professeurs
-    public function index() {
-        $professeurs = $this->model->getAll();
-        require_once __DIR__ . '/../views/professeur/index.php';
+    // 1. Lister tous les professeurs (retourne tableau d’objets)
+    public function index(): array {
+        $professeurs = [];
+        $stmt = $this->pdo->query("SELECT * FROM professeur ORDER BY nom, prenom");
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($rows as $row) {
+            $professeurs[] = new Professeur(
+                $row['id'],
+                $row['nom'],
+                $row['prenom'],
+                $row['grade'],
+                $row['id_etab']
+            );
+        }
+
+        return $professeurs;
     }
 
-    // Formulaire + traitement création
-    public function new() {
+    // 2. Enregistrer un nouveau professeur (retourne l’objet créé)
+    public function new(): ?Professeur {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->model->setNom($_POST['nom']);
-            $this->model->setPrenom($_POST['prenom']);
-            $this->model->setGrade($_POST['grade']);
-            $this->model->setEtablissementId($_POST['etablissement_id']);
-            if ($this->model->save()) {
-                header('Location: index.php?controller=professeur&action=index');
-                exit;
+            $professeur = new Professeur(
+                null,
+                $_POST['nom'] ?? '',
+                $_POST['prenom'] ?? '',
+                $_POST['grade'] ?? '',
+                $_POST['etablissement_id'] ?? null
+            );
+
+            $stmt = $this->pdo->prepare("
+                INSERT INTO professeur (nom, prenom, grade, id_etab) 
+                VALUES (?, ?, ?, ?)
+            ");
+
+            $success = $stmt->execute([
+                $professeur->getNom(),
+                $professeur->getPrenom(),
+                $professeur->getGrade(),
+                $professeur->getEtablissementId()
+            ]);
+
+            if ($success) {
+                $professeur->setId($this->pdo->lastInsertId());
+                return $professeur;
             }
         }
-        $professeur = $this->model;
-        $etablissements = $this->model->getAllEtablissements();
-        require_once __DIR__ . '/../views/professeur/form.php';
+
+        return null;
     }
 
-    // Alias pour new()
-    public function create() {
-        return $this->new();
+    // 3.1 Récupérer un professeur par son ID
+    public function getById(int $id): ?Professeur {
+        return $this->professeurRepository->getById($id);
     }
 
-    // Formulaire + traitement modification
-    public function edit() {
-        if (!isset($_GET['id'])) {
-            header('Location: index.php?controller=professeur&action=index');
-            exit;
-        }
+    // 3.2 Modifier un professeur
+    public function edit(int $id, Professeur $professeur): ?Professeur {
+        $stmt = $this->pdo->prepare("
+            UPDATE professeur 
+            SET nom = ?, prenom = ?, grade = ?, id_etab = ?
+            WHERE id = ?
+        ");
+        
+        $stmt->execute([
+            $professeur->getNom(),
+            $professeur->getPrenom(),
+            $professeur->getGrade(),
+            $professeur->getEtablissementId(),
+            $id
+        ]);
+
+        return $professeur;
+    }
+
+    // 4. Supprimer un professeur (retourne true ou false)
+    public function delete(): bool {
+        if (!isset($_GET['id'])) return false;
 
         $id = (int)$_GET['id'];
-        $data = $this->model->getById($id);
-        
-        if (!$data) {
-            header('Location: index.php?controller=professeur&action=index');
-            exit;
-        }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->model->setId($id);
-            $this->model->setNom($_POST['nom']);
-            $this->model->setPrenom($_POST['prenom']);
-            $this->model->setGrade($_POST['grade']);
-            $this->model->setEtablissementId($_POST['etablissement_id']);
-            if ($this->model->update()) {
-                header('Location: index.php?controller=professeur&action=index');
-                exit;
-            }
-        } else {
-            // Accès aux propriétés de l'objet avec -> au lieu de ['']
-            $this->model->setId($data->id);
-            $this->model->setNom($data->nom);
-            $this->model->setPrenom($data->prenom);
-            $this->model->setGrade($data->grade);
-            $this->model->setEtablissementId($data->id_etab); // Note: id_etab au lieu de etablissement_id
-        }
-        $professeur = $this->model;
-        $etablissements = $this->model->getAllEtablissements();
-        require_once __DIR__ . '/../views/professeur/form.php';
-    }
-
-    // Supprime un professeur
-    public function delete() {
-        if (!isset($_GET['id'])) {
-            header('Location: index.php?controller=professeur&action=index');
-            exit;
-        }
-        $this->model->setId((int)$_GET['id']);
-        $this->model->delete();
-        header('Location: index.php?controller=professeur&action=index');
-        exit;
+        $stmt = $this->pdo->prepare("DELETE FROM professeur WHERE id = ?");
+        return $stmt->execute([$id]);
     }
 }

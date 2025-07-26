@@ -76,7 +76,7 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top shadow-sm">
   <div class="container">
-    <a class="navbar-brand d-flex align-items-center" href="/app/index.php">
+    <a class="navbar-brand d-flex align-items-center" href="index.php">
         <i class="bi bi-journal-check me-2"></i>
         <span>Gestion Correction</span>
       </a>
@@ -85,12 +85,31 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto align-items-center">
-      <li class="nav-item"><a class="nav-link" href="/app/index.php?controller=etablissement&action=index">Établissements</a></li>
-        <li class="nav-item"><a class="nav-link" href="/app/index.php?controller=professeur&action=index">Professeurs</a></li>
-        <li class="nav-item"><a class="nav-link" href="/app/index.php?controller=examen&action=index">Examens</a></li>
-        <li class="nav-item"><a class="nav-link" href="/app/index.php?controller=epreuve&action=index">Épreuves</a></li>
-        <li class="nav-item"><a class="nav-link" href="/app/index.php?controller=correction&action=index">Corrections</a></li>
-        
+        <li class="nav-item">
+          <a class="nav-link" href="/app/index.php">
+            <i class="bi bi-house-door me-1"></i> Accueil
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/app/src/Views/professeur/index.php">
+            <i class="bi bi-person-video3 me-1"></i> Professeurs
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/app/src/Views/examen/index.php">
+            <i class="bi bi-file-text me-1"></i> Examens
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/app/src/Views/epreuve/index.php">
+            <i class="bi bi-journal-text me-1"></i> Épreuves
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/app/src/Views/correction/index.php">
+            <i class="bi bi-check2-circle me-1"></i> Corrections
+          </a>
+        </li>
       </ul>
     </div>
   </div>

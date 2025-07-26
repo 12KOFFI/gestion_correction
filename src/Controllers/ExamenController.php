@@ -1,70 +1,109 @@
 <?php
 namespace App\Controllers;
 
+use Config\Database;
 use App\Models\Examen;
+use App\Repository\ExamenRepository;
+use PDO;
 
 class ExamenController {
-    protected Examen $model;
+    private $pdo;
+    private $examenRepository;
 
     public function __construct() {
-        $this->model = new Examen();
+        $this->pdo = Database::getConnection();
+        $this->examenRepository = new ExamenRepository();
     }
 
-    // Liste tous les examens
-    public function index() {
-        $examens = $this->model->getAll();
-        require_once __DIR__ . '/../views/examen/index.php';
+    // 1. Lister tous les examens
+    public function index(): array {
+        $examens = [];
+        $stmt = $this->pdo->query("SELECT * FROM examen ORDER BY id DESC");
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($rows as $row) {
+            $examens[] = new Examen(
+                (int)$row['id'],
+                $row['nom']
+            );
+        }
+
+        return $examens;
     }
 
-    // Affiche le formulaire et traite la création d'un examen
-    public function new() {
+    // 2. Créer un nouvel examen
+    public function new(): ?Examen {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->model->formArray($_POST);
-            $this->model->save();
-            header('Location: ?controller=examen&action=index');
-            exit;
+            $examen = new Examen(
+                null,
+                $_POST['nom']
+            );
+
+            $stmt = $this->pdo->prepare("INSERT INTO examen (nom) VALUES (?)");
+            $stmt->execute([$examen->getNom()]);
+
+            $examen->setId((int)$this->pdo->lastInsertId());
+            return $examen;
         }
-        // affichage formulaire vide
-        $examen = null;
-        require_once __DIR__ . '/../views/examen/form.php';
+
+        return null;
     }
 
-    public function create() {
-        return $this->new();
+    // 3.1 Récupérer un examen par son ID
+    public function getById(int $id): ?Examen {
+        return $this->examenRepository->getById($id);
     }
 
-    // Affiche le formulaire d'édition et traite la mise à jour
-    public function edit() {
-        if (!isset($_GET['id'])) {
-            header('Location: ?controller=examen&action=index');
-            exit;
+    // 3.2 Modifier un examen existant
+    public function edit(): ?Examen {
+        if (!isset($_GET['id'])) return null;
+
+        $id = (int)$_GET['id'];
+
+        // Si c'est une requête GET, on retourne l'examen existant
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return $this->getById($id);
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->model->formArray($_POST);
-            $this->model->update();
-            header('Location: ?controller=examen&action=index');
-            exit;
-        }
+        $examen = new Examen(
+            $id,
+            $_POST['nom']
+        );
 
-        $examen = $this->model->getById((int)$_GET['id']);
-        if (!$examen) {
-            header('Location: ?controller=examen&action=index');
-            exit;
-        }
+        $stmt = $this->pdo->prepare("UPDATE examen SET nom = ? WHERE id = ?");
+        $stmt->execute([
+            $examen->getNom(),
+            $examen->getId()
+        ]);
 
-        require_once __DIR__ . '/../views/examen/form.php';
+        return $examen;
     }
 
-    // Supprime un examen par son ID
-    public function delete() {
-        if (!isset($_GET['id'])) {
-            header('Location: ?controller=examen&action=index');
-            exit;
+    // 4. Supprimer un examen
+    public function delete(int $id): bool {
+        error_log('Méthode delete appelée avec l\'ID: ' . $id);
+        try {
+            // Vérifier d'abord si l'examen existe
+            $examen = $this->getById($id);
+            if (!$examen) {
+                error_log("Tentative de suppression d'un examen inexistant (ID: $id)");
+                return false;
+            }
+
+            $stmt = $this->pdo->prepare("DELETE FROM examen WHERE id = ?");
+            $result = $stmt->execute([$id]);
+            
+            if ($result && $stmt->rowCount() > 0) {
+                error_log("Examen supprimé avec succès (ID: $id)");
+                return true;
+            }
+            
+            error_log("Échec de la suppression de l'examen (ID: $id)");
+            return false;
+            
+        } catch (\PDOException $e) {
+            error_log("Erreur lors de la suppression de l'examen (ID: $id): " . $e->getMessage());
+            return false;
         }
-        $this->model->setId((int)$_GET['id']);
-        $this->model->delete();
-        header('Location: ?controller=examen&action=index');
-        exit;
     }
 }
