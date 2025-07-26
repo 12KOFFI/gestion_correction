@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace App\Controllers;
 
 use Config\Database;
@@ -58,7 +59,7 @@ class ProfesseurController {
             ]);
 
             if ($success) {
-                $professeur->setId($this->pdo->lastInsertId());
+                $professeur->setId((int)$this->pdo->lastInsertId());
                 return $professeur;
             }
         }

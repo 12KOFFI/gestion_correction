@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace App\Controllers;
 
 use Config\Database;
@@ -40,7 +41,7 @@ class EtablissementController {
             $etablissement->getVille()
         ]);
 
-        $etablissement->setId($this->pdo->lastInsertId());
+        $etablissement->setId((int)$this->pdo->lastInsertId());
         return $etablissement;
     }
 

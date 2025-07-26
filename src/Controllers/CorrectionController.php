@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1); // Indique que le code doit être typé strictement
 namespace App\Controllers;
 
 use Config\Database;
