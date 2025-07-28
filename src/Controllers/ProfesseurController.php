@@ -2,69 +2,47 @@
 declare(strict_types=1);
 namespace App\Controllers;
 
-use Config\Database;
 use App\Models\Professeur;
 use App\Repository\ProfesseurRepository;
-use PDO;
 
 class ProfesseurController {
-    private $pdo;
     private $professeurRepository;
 
     public function __construct() {
-        $this->pdo = Database::getConnection();
         $this->professeurRepository = new ProfesseurRepository();
     }
 
-    // 1. Lister tous les professeurs (retourne tableau d’objets)
+    /**
+     * Liste tous les professeurs avec leurs informations d'établissement
+     * 
+     * @return array Tableau d'objets Professeur
+     */
     public function index(): array {
-        $professeurs = [];
-        $stmt = $this->pdo->query("SELECT * FROM professeur ORDER BY nom, prenom");
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        foreach ($rows as $row) {
-            $professeurs[] = new Professeur(
-                $row['id'],
-                $row['nom'],
-                $row['prenom'],
-                $row['grade'],
-                $row['id_etab']
-            );
-        }
-
-        return $professeurs;
+        return $this->professeurRepository->getAll();
     }
 
-    // 2. Enregistrer un nouveau professeur (retourne l’objet créé)
-    public function new(): ?Professeur {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $professeur = new Professeur(
-                null,
-                $_POST['nom'] ?? '',
-                $_POST['prenom'] ?? '',
-                $_POST['grade'] ?? '',
-                $_POST['etablissement_id'] ?? null
-            );
-
-            $stmt = $this->pdo->prepare("
-                INSERT INTO professeur (nom, prenom, grade, id_etab) 
-                VALUES (?, ?, ?, ?)
-            ");
-
-            $success = $stmt->execute([
-                $professeur->getNom(),
-                $professeur->getPrenom(),
-                $professeur->getGrade(),
-                $professeur->getEtablissementId()
-            ]);
-
-            if ($success) {
-                $professeur->setId((int)$this->pdo->lastInsertId());
-                return $professeur;
-            }
+    /**
+     * Crée un nouveau professeur
+     * 
+     * @param array $data Les données du professeur à créer
+     * @return Professeur|null Le professeur créé ou null en cas d'échec
+     * @throws \Exception Si les données sont invalides
+     */
+    public function new(array $data): ?Professeur {
+        // Validation des champs obligatoires
+        if (empty($data['nom']) || empty($data['prenom'])) {
+            throw new \Exception('Le nom et le prénom sont obligatoires');
         }
 
-        return null;
+        $professeur = new Professeur(
+            null,
+            $data['nom'],
+            $data['prenom'],
+            $data['grade'] ?? '',
+            !empty($data['etablissement_id']) ? (int)$data['etablissement_id'] : null
+        );
+
+        return $this->professeurRepository->save($professeur);
     }
 
     // 3.1 Récupérer un professeur par son ID
@@ -72,52 +50,59 @@ class ProfesseurController {
         return $this->professeurRepository->getById($id);
     }
 
-    // 3.2 Modifier un professeur
-    public function edit(int $id, Professeur $professeur): ?Professeur {
-        $stmt = $this->pdo->prepare("
-            UPDATE professeur 
-            SET nom = ?, prenom = ?, grade = ?, id_etab = ?
-            WHERE id = ?
-        ");
+    /**
+     * Modifie un professeur existant
+     * 
+     * @param int $id ID du professeur à modifier
+     * @param array $data Les nouvelles données du professeur
+     * @return Professeur|null Le professeur modifié ou null en cas d'échec
+     * @throws \Exception Si les données sont invalides
+     */
+    public function edit(int $id, array $data): ?Professeur {
+        // Vérifier d'abord si le professeur existe
+        $existingProfesseur = $this->professeurRepository->getById($id);
         
-        $stmt->execute([
-            $professeur->getNom(),
-            $professeur->getPrenom(),
-            $professeur->getGrade(),
-            $professeur->getEtablissementId(),
-            $id
-        ]);
-
-        return $professeur;
+        if (!$existingProfesseur) {
+            error_log("Tentative de mise à jour d'un professeur inexistant (ID: $id)");
+            return null;
+        }
+        
+        // Validation des champs obligatoires
+        if (empty($data['nom']) || empty($data['prenom'])) {
+            throw new \Exception('Le nom et le prénom sont obligatoires');
+        }
+        
+        // Mettre à jour les propriétés du professeur existant
+        $existingProfesseur->setNom($data['nom']);
+        $existingProfesseur->setPrenom($data['prenom']);
+        $existingProfesseur->setGrade($data['grade'] ?? '');
+        $existingProfesseur->setEtablissementId(!empty($data['etablissement_id']) ? (int)$data['etablissement_id'] : null);
+        
+        // Utiliser le repository pour la mise à jour
+        return $this->professeurRepository->update($existingProfesseur);
     }
 
-    // 4. Supprimer un professeur (retourne true ou false)
-    public function delete(): bool {
-        if (!isset($_POST['id'])) return false;
-        
-        $id = (int)$_POST['id'];
+    /**
+     * Supprime un professeur et ses corrections associées
+     * 
+     * @param int $id ID du professeur à supprimer
+     * @return bool True si la suppression a réussi, false sinon
+     */
+    public function delete(int $id): bool {
+        error_log('Tentative de suppression du professeur avec l\'ID: ' . $id);
         
         try {
-            // Désactiver temporairement la vérification des clés étrangères
-            $this->pdo->exec('SET FOREIGN_KEY_CHECKS=0');
+            $result = $this->professeurRepository->delete($id);
             
-            // Supprimer d'abord les corrections associées à ce professeur
-            $stmt = $this->pdo->prepare("DELETE FROM correction WHERE id_professeur = ?");
-            $stmt->execute([$id]);
+            if ($result) {
+                error_log("Professeur supprimé avec succès (ID: $id)");
+            } else {
+                error_log("Échec de la suppression du professeur (ID: $id)");
+            }
             
-            // Ensuite supprimer le professeur
-            $stmt = $this->pdo->prepare("DELETE FROM professeur WHERE id = ?");
-            $success = $stmt->execute([$id]);
-            
-            // Réactiver la vérification des clés étrangères
-            $this->pdo->exec('SET FOREIGN_KEY_CHECKS=1');
-            
-            return $success;
-            
+            return $result;
         } catch (\PDOException $e) {
-            // En cas d'erreur, s'assurer que la vérification des clés étrangères est réactivée
-            $this->pdo->exec('SET FOREIGN_KEY_CHECKS=1');
-            error_log('Erreur lors de la suppression du professeur: ' . $e->getMessage());
+            error_log("Erreur lors de la suppression du professeur (ID: $id): " . $e->getMessage());
             return false;
         }
     }

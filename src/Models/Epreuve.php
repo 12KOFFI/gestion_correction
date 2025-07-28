@@ -9,6 +9,9 @@ class Epreuve extends BaseModel {
     private string $nom;
     private string $type;
     private ?int $id_examen;
+    
+    // Propriété pour la jointure avec Examen
+    private ?string $examen_nom = null;
 
     public function __construct(
         ?int $id = null,
@@ -54,6 +57,15 @@ class Epreuve extends BaseModel {
     
     public function setIdExamen(?int $id_examen): void { 
         $this->id_examen = $id_examen; 
+    }
+    
+    // Getter et setter pour examen_nom
+    public function getExamenNom(): ?string {
+        return $this->examen_nom;
+    }
+    
+    public function setExamenNom(?string $examen_nom): void {
+        $this->examen_nom = $examen_nom;
     }
 
 

@@ -3,10 +3,8 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 // Importation des classes nécessaires
-use App\Config\Database;
 use App\Controllers\EpreuveController;
 use App\Controllers\ExamenController;
-use App\Models\Epreuve;
 
 // Initialisation
 $epreuveController = new EpreuveController();
@@ -20,39 +18,39 @@ try {
     $examens = [];
 }
 
-$epreuve = new Epreuve(null, '', '', null);
+// Initialisation des variables
+$epreuve = null;
 $isEdit = false;
 $errors = [];
 
 // Traitement du formulaire
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = isset($_POST['id']) ? (int)$_POST['id'] : null;
-    $nom = trim($_POST['nom'] ?? '');
-    $type = trim($_POST['type'] ?? '');
-    $id_examen = !empty($_POST['id_examen']) ? (int)$_POST['id_examen'] : null;
+    $data = [
+        'nom' => trim($_POST['nom'] ?? ''),
+        'type' => trim($_POST['type'] ?? ''),
+        'id_examen' => !empty($_POST['id_examen']) ? (int)$_POST['id_examen'] : null
+    ];
     
     try {
-        $epreuve = new Epreuve($id, $nom, $type, $id_examen);
-        $isEdit = ($id !== null);
-        
         // Validation des champs obligatoires
-        if (empty($nom)) {
+        if (empty($data['nom'])) {
             throw new Exception('Le nom de l\'épreuve est obligatoire');
         }
         
-        if (empty($type)) {
+        if (empty($data['type'])) {
             throw new Exception('Le type d\'épreuve est obligatoire');
         }
         
         // Création ou mise à jour
-        if ($isEdit) {
-            $success = $epreuveController->edit($id, $epreuve);
-            if (!$success) {
+        if ($id) {
+            $epreuve = $epreuveController->edit($id, $data);
+            if (!$epreuve) {
                 throw new Exception('Échec de la mise à jour de l\'épreuve. Vérifiez que l\'épreuve existe.');
             }
             $message = 'Épreuve mise à jour avec succès';
         } else {
-            $epreuve = $epreuveController->new($epreuve);
+            $epreuve = $epreuveController->new($data);
             $message = 'Épreuve créée avec succès';
         }
         
@@ -125,7 +123,10 @@ $title = $isEdit ? 'Modifier une épreuve' : 'Ajouter une épreuve';
                         </div>
                     <?php endif; ?>
                     
-                    <form method="post" action="form.php<?= $isEdit ? '?id=' . $epreuve->getId() : '' ?>" class="needs-validation" novalidate>
+                    <form method="post" action="form.php" class="needs-validation" novalidate>
+                        <?php if ($isEdit): ?>
+                        <input type="hidden" name="id" value="<?= $epreuve->getId() ?>">
+                        <?php endif; ?>
                         
                         <div class="mb-3">
                             <label for="nom" class="form-label">Nom de l'épreuve <span class="text-danger">*</span></label>

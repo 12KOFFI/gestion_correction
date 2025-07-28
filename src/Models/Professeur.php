@@ -10,6 +10,11 @@ class Professeur extends BaseModel {
     private string $prenom;
     private string $grade;
     private ?int $id_etab;
+    
+    // Propriétés pour les jointures
+    private ?string $etablissement_nom = null;
+    private ?string $etablissement_ville = null;
+    private int $nb_corrections = 0;
 
     public function __construct(
         ?int $id = null,
@@ -65,6 +70,31 @@ class Professeur extends BaseModel {
     
     public function setEtablissementId(?int $id_etab): void {
         $this->id_etab = $id_etab;
+    }
+    
+    // Getters pour les propriétés de jointure
+    public function getEtablissementNom(): ?string {
+        return $this->etablissement_nom;
+    }
+    
+    public function setEtablissementNom(?string $etablissement_nom): void {
+        $this->etablissement_nom = $etablissement_nom;
+    }
+    
+    public function getEtablissementVille(): ?string {
+        return $this->etablissement_ville;
+    }
+    
+    public function setEtablissementVille(?string $etablissement_ville): void {
+        $this->etablissement_ville = $etablissement_ville;
+    }
+    
+    public function getNbCorrections(): int {
+        return $this->nb_corrections;
+    }
+    
+    public function setNbCorrections(int $nb_corrections): void {
+        $this->nb_corrections = $nb_corrections;
     }
 }
 

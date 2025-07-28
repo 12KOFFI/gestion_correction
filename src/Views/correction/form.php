@@ -6,7 +6,6 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 use App\Controllers\CorrectionController;
 use App\Controllers\ProfesseurController;
 use App\Controllers\EpreuveController;
-use App\Models\Correction;
 
 // Initialisation
 $correctionController = new CorrectionController();
@@ -21,43 +20,28 @@ $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $id = isset($_POST['id']) ? (int)$_POST['id'] : null;
-        $id_professeur = (int)$_POST['id_professeur'];
-        $id_epreuve = (int)$_POST['id_epreuve'];
-        $date = $_POST['date'];
-        $nbr_copie = (int)$_POST['nbr_copie'];
+        $data = [
+            'id_professeur' => (int)$_POST['id_professeur'],
+            'id_epreuve' => (int)$_POST['id_epreuve'],
+            'date' => $_POST['date'],
+            'nbr_copie' => (int)$_POST['nbr_copie']
+        ];
         
         // Validation des données
-        if (empty($id_professeur) || empty($id_epreuve) || empty($date) || $nbr_copie <= 0) {
+        if (empty($data['id_professeur']) || empty($data['id_epreuve']) || empty($data['date']) || $data['nbr_copie'] <= 0) {
             throw new Exception("Tous les champs sont obligatoires et le nombre de copies doit être supérieur à zéro.");
         }
         
         // Création ou mise à jour de la correction
         if ($id) {
             // Mise à jour
-            $correction = $correctionController->getById($id);
+            $correction = $correctionController->edit($id, $data);
             if (!$correction) {
-                throw new Exception("La correction à mettre à jour n'existe pas.");
-            }
-            $data = [
-                'id_professeur' => $id_professeur,
-                'id_epreuve' => $id_epreuve,
-                'date' => $date,
-                'nbr_copie' => $nbr_copie
-            ];
-            
-            $updatedCorrection = $correctionController->edit($id, $data);
-            if (!$updatedCorrection) {
-                throw new Exception("Échec de la mise à jour de la correction.");
+                throw new Exception("Échec de la mise à jour de la correction. Vérifiez que la correction existe et que les données sont valides.");
             }
             $message = 'Correction mise à jour avec succès';
         } else {
             // Création
-            $data = [
-                'id_professeur' => $id_professeur,
-                'id_epreuve' => $id_epreuve,
-                'date' => $date,
-                'nbr_copie' => $nbr_copie
-            ];
             $correction = $correctionController->new($data);
             $message = 'Correction créée avec succès';
         }

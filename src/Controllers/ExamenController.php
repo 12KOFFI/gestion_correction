@@ -3,52 +3,43 @@
 declare(strict_types=1);
 namespace App\Controllers;
 
-use Config\Database;
 use App\Models\Examen;
 use App\Repository\ExamenRepository;
-use PDO;
 
 class ExamenController {
-    private $pdo;
     private $examenRepository;
 
     public function __construct() {
-        $this->pdo = Database::getConnection();
         $this->examenRepository = new ExamenRepository();
     }
 
-    // 1. Lister tous les examens
+    /**
+     * Récupère tous les examens
+     * 
+     * @return array Tableau d'objets Examen
+     */
     public function index(): array {
-        $examens = [];
-        $stmt = $this->pdo->query("SELECT * FROM examen ORDER BY id DESC");
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        foreach ($rows as $row) {
-            $examens[] = new Examen(
-                (int)$row['id'],
-                $row['nom']
-            );
-        }
-
-        return $examens;
+        return $this->examenRepository->getAll();
     }
 
-    // 2. Créer un nouvel examen
-    public function new(): ?Examen {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $examen = new Examen(
-                null,
-                $_POST['nom']
-            );
-
-            $stmt = $this->pdo->prepare("INSERT INTO examen (nom) VALUES (?)");
-            $stmt->execute([$examen->getNom()]);
-
-            $examen->setId((int)$this->pdo->lastInsertId());
-            return $examen;
+    /**
+     * Crée un nouvel examen
+     * 
+     * @param array $data Les données de l'examen à créer
+     * @return Examen|null L'examen créé ou null en cas d'échec
+     * @throws \Exception Si les données sont invalides
+     */
+    public function new(array $data): ?Examen {
+        if (empty($data['nom'])) {
+            throw new \Exception('Le nom de l\'examen est obligatoire');
         }
 
-        return null;
+        $examen = new Examen(
+            null,
+            $data['nom']
+        );
+
+        return $this->examenRepository->save($examen);
     }
 
     // 3.1 Récupérer un examen par son ID
@@ -56,53 +47,59 @@ class ExamenController {
         return $this->examenRepository->getById($id);
     }
 
-    // 3.2 Modifier un examen existant
-    public function edit(): ?Examen {
-        if (!isset($_GET['id'])) return null;
-
-        $id = (int)$_GET['id'];
-
-        // Si c'est une requête GET, on retourne l'examen existant
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            return $this->getById($id);
+    /**
+     * Affiche le formulaire de modification d'un examen (GET)
+     * 
+     * @param int $id ID de l'examen à modifier
+     * @return Examen|null L'examen à modifier ou null si non trouvé
+     */
+    public function editForm(int $id): ?Examen {
+        return $this->getById($id);
+    }
+    
+    /**
+     * Traite la soumission du formulaire de modification d'un examen (POST)
+     * 
+     * @param int $id ID de l'examen à modifier
+     * @param array $data Les données de l'examen à mettre à jour
+     * @return Examen|null L'examen modifié ou null en cas d'échec
+     */
+    public function edit(int $id, array $data): ?Examen {
+        // Vérifier d'abord si l'examen existe
+        $existingExamen = $this->examenRepository->getById($id);
+        
+        if (!$existingExamen) {
+            return null;
         }
-
-        $examen = new Examen(
-            $id,
-            $_POST['nom']
-        );
-
-        $stmt = $this->pdo->prepare("UPDATE examen SET nom = ? WHERE id = ?");
-        $stmt->execute([
-            $examen->getNom(),
-            $examen->getId()
-        ]);
-
-        return $examen;
+        
+        // Mettre à jour les propriétés de l'examen existant
+        if (isset($data['nom'])) {
+            $existingExamen->setNom($data['nom']);
+        }
+        
+        // Sauvegarder les modifications
+        return $this->examenRepository->save($existingExamen);
     }
 
-    // 4. Supprimer un examen
+    /**
+     * Supprime un examen
+     * 
+     * @param int $id ID de l'examen à supprimer
+     * @return bool True si la suppression a réussi, false sinon
+     */
     public function delete(int $id): bool {
-        error_log('Méthode delete appelée avec l\'ID: ' . $id);
+        error_log('Tentative de suppression de l\'examen avec l\'ID: ' . $id);
+        
         try {
-            // Vérifier d'abord si l'examen existe
-            $examen = $this->getById($id);
-            if (!$examen) {
-                error_log("Tentative de suppression d'un examen inexistant (ID: $id)");
-                return false;
-            }
-
-            $stmt = $this->pdo->prepare("DELETE FROM examen WHERE id = ?");
-            $result = $stmt->execute([$id]);
+            $result = $this->examenRepository->delete($id);
             
-            if ($result && $stmt->rowCount() > 0) {
+            if ($result) {
                 error_log("Examen supprimé avec succès (ID: $id)");
-                return true;
+            } else {
+                error_log("Échec de la suppression de l'examen (ID: $id)");
             }
             
-            error_log("Échec de la suppression de l'examen (ID: $id)");
-            return false;
-            
+            return $result;
         } catch (\PDOException $e) {
             error_log("Erreur lors de la suppression de l'examen (ID: $id): " . $e->getMessage());
             return false;

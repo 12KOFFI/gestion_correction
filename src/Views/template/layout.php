@@ -76,7 +76,7 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top shadow-sm">
   <div class="container">
-    <a class="navbar-brand d-flex align-items-center" href="index.php">
+    <a class="navbar-brand d-flex align-items-center" href="/app/">
         <i class="bi bi-journal-check me-2"></i>
         <span>Gestion Correction</span>
       </a>

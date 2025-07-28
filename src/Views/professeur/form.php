@@ -2,23 +2,22 @@
 // Chargement de l'autoloader Composer
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-// Importation des classes nécessaires
+// Importation des contrôleurs nécessaires
 use App\Controllers\ProfesseurController;
 use App\Controllers\EtablissementController;
-use App\Models\Professeur;
 
 // Initialisation des contrôleurs
 $professeurController = new ProfesseurController();
 $etablissementController = new EtablissementController();
 
 // Initialisation des variables
-$professeur = new Professeur(
-    null,           // id
-    '',             // nom
-    '',             // prenom
-    '',             // grade
-    null            // etablissement_id
-);
+$professeur = [
+    'id' => null,
+    'nom' => '',
+    'prenom' => '',
+    'grade' => '',
+    'etablissement_id' => null
+];
 $isEdit = false;
 $title = 'Ajouter un professeur';
 
@@ -29,35 +28,44 @@ if (isset($_GET['id'])) {
     
     // Si ce n'est pas une soumission de formulaire, on récupère le professeur depuis la base de données
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        $professeur = $professeurController->getById($id);
+        $profData = $professeurController->getById($id);
         
-        if (!$professeur) {
+        if (!$profData) {
             header('Location: index.php?error=' . urlencode('Professeur non trouvé'));
             exit();
         }
-        $title = 'Modifier le professeur : ' . htmlspecialchars($professeur->getPrenom() . ' ' . $professeur->getNom());
+        
+        // Convertir l'objet en tableau
+        $professeur = [
+            'id' => $profData->getId(),
+            'nom' => $profData->getNom(),
+            'prenom' => $profData->getPrenom(),
+            'grade' => $profData->getGrade(),
+            'etablissement_id' => $profData->getEtablissementId()
+        ];
+        
+        $title = 'Modifier le professeur : ' . htmlspecialchars($professeur['prenom'] . ' ' . $professeur['nom']);
     }
 }
 
 // Traitement du formulaire
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Création de l'objet Professeur avec les données du formulaire
-    $professeur = new Professeur(
-        $isEdit ? (int)$_GET['id'] : null,  // id
-        $_POST['nom'] ?? '',                // nom
-        $_POST['prenom'] ?? '',             // prenom
-        $_POST['grade'] ?? '',              // grade
-        !empty($_POST['etablissement_id']) ? (int)$_POST['etablissement_id'] : null  // etablissement_id
-    );
+    // Préparation des données du formulaire
+    $professeurData = [
+        'nom' => $_POST['nom'] ?? '',
+        'prenom' => $_POST['prenom'] ?? '',
+        'grade' => $_POST['grade'] ?? '',
+        'etablissement_id' => !empty($_POST['etablissement_id']) ? (int)$_POST['etablissement_id'] : null
+    ];
     
     try {
         if ($isEdit) {
             // Mise à jour d'un professeur existant
-            $professeur = $professeurController->edit((int)$_GET['id'], $professeur);
+            $professeur = $professeurController->edit((int)$_GET['id'], $professeurData);
             $message = 'Professeur mis à jour avec succès';
         } else {
             // Création d'un nouveau professeur
-            $professeur = $professeurController->new();
+            $professeur = $professeurController->new($professeurData);
             $message = 'Professeur ajouté avec succès';
         }
         
@@ -92,12 +100,12 @@ ob_start(); ?>
                     <h2 class="h5 mb-0"><?= $title ?></h2>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="form.php<?= $isEdit ? '?id=' . $professeur->getId() : '' ?>" novalidate>
+                    <form method="post" action="form.php<?= $isEdit ? '?id=' . $professeur['id'] : '' ?>" novalidate>
                         <div class="mb-3">
                             <label for="nom" class="form-label">Nom <span class="text-danger">*</span></label>
                             <input type="text" id="nom" name="nom" required 
                                    class="form-control <?= isset($errors['nom']) ? 'is-invalid' : '' ?>"
-                                   value="<?= htmlspecialchars($professeur->getNom()) ?>">
+                                   value="<?= htmlspecialchars($professeur['nom']) ?>">
                             <?php if (isset($errors['nom'])) : ?>
                                 <div class="invalid-feedback"><?= htmlspecialchars($errors['nom']) ?></div>
                             <?php endif; ?>
@@ -107,7 +115,7 @@ ob_start(); ?>
                             <label for="prenom" class="form-label">Prénom <span class="text-danger">*</span></label>
                             <input type="text" id="prenom" name="prenom" required
                                    class="form-control <?= isset($errors['prenom']) ? 'is-invalid' : '' ?>"
-                                   value="<?= htmlspecialchars($professeur->getPrenom()) ?>">
+                                   value="<?= htmlspecialchars($professeur['prenom']) ?>">
                             <?php if (isset($errors['prenom'])) : ?>
                                 <div class="invalid-feedback"><?= htmlspecialchars($errors['prenom']) ?></div>
                             <?php endif; ?>
@@ -117,7 +125,7 @@ ob_start(); ?>
                             <label for="grade" class="form-label">Grade <span class="text-danger">*</span></label>
                             <input type="text" id="grade" name="grade" required
                                    class="form-control <?= isset($errors['grade']) ? 'is-invalid' : '' ?>"
-                                   value="<?= htmlspecialchars($professeur->getGrade()) ?>">
+                                   value="<?= htmlspecialchars($professeur['grade']) ?>">
                             <?php if (isset($errors['grade'])) : ?>
                                 <div class="invalid-feedback"><?= htmlspecialchars($errors['grade']) ?></div>
                             <?php endif; ?>
@@ -129,7 +137,7 @@ ob_start(); ?>
                                     id="etablissement_id" name="etablissement_id" required>
                                 <option value="">Sélectionner un établissement</option>
                                 <?php foreach ($etablissements as $etablissement) : ?>
-                                    <option value="<?= $etablissement->getId() ?>" <?= $professeur->getEtablissementId() == $etablissement->getId() ? 'selected' : '' ?>>
+                                    <option value="<?= $etablissement->getId() ?>" <?= $professeur['etablissement_id'] == $etablissement->getId() ? 'selected' : '' ?>>
                                         <?= htmlspecialchars($etablissement->getNom()) ?>
                                     </option>
                                 <?php endforeach; ?>

@@ -4,15 +4,11 @@ namespace App\Controllers;
 
 use App\Models\Epreuve;
 use App\Repository\EpreuveRepository;
-use Config\Database;
-use PDO;
 
 class EpreuveController {
-    private $pdo;
     private $epreuveRepository;
 
     public function __construct() {
-        $this->pdo = Database::getConnection();
         $this->epreuveRepository = new EpreuveRepository();
     }
     
@@ -23,87 +19,82 @@ class EpreuveController {
         return $this->epreuveRepository->getById($id);
     }
 
-    // 1. Lister toutes les épreuves
+    /**
+     * Récupère toutes les épreuves
+     * 
+     * @return array Tableau d'objets Epreuve
+     */
     public function index(): array {
-        // Récupérer les épreuves
-        $stmt = $this->pdo->query("SELECT * FROM epreuve");
-        if ($stmt === false) {
-            $error = $this->pdo->errorInfo();
-            throw new \Exception("Erreur lors de la récupération des épreuves: " . ($error[2] ?? 'Erreur inconnue'));
-        }
-        
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // Debug: Afficher le nombre d'épreuves trouvées
-        error_log("Nombre d'épreuves trouvées: " . count($rows));
-
-        $epreuves = [];
-        foreach ($rows as $row) {
-            $epreuves[] = new Epreuve(
-                (int)$row['id'],
-                $row['nom'],
-                $row['type'],
-                isset($row['id_examen']) ? (int)$row['id_examen'] : null
-            );
-        }
-
-        return $epreuves;
-    }
-
-    // 2. Enregistrer une nouvelle épreuve
-    public function new(Epreuve $epreuve): Epreuve {
-        $stmt = $this->pdo->prepare("
-            INSERT INTO epreuve (nom, type, id_examen) 
-            VALUES (?, ?, ?)
-        ");
-        $stmt->execute([
-            $epreuve->getNom(),
-            $epreuve->getType(),
-            $epreuve->getIdExamen()
-        ]);
-
-        $epreuve->setId((int)$this->pdo->lastInsertId());
-        return $epreuve;
+        return $this->epreuveRepository->getAll();
     }
 
     /**
-     * Modifie une épreuve existants
+     * Enregistre une nouvelle épreuve
+     * 
+     * @param array $data Les données de l'épreuve à enregistrer
+     * @return Epreuve L'épreuve enregistrée avec son ID
+     * @throws \Exception Si l'enregistrement échoue
      */
-    public function edit(int $id, Epreuve $epreuve): bool {
+    public function new(array $data): Epreuve {
+        // Créer une nouvelle instance d'Epreuve avec les données fournies
+        $epreuve = new Epreuve(
+            null,
+            $data['nom'] ?? '',
+            $data['type'] ?? '',
+            $data['id_examen'] ?? null
+        );
+        
+        $savedEpreuve = $this->epreuveRepository->save($epreuve);
+        if ($savedEpreuve === null) {
+            throw new \Exception("Échec de l'enregistrement de l'épreuve");
+        }
+        return $savedEpreuve;
+    }
+
+    /**
+     * Modifie une épreuve existante
+     * 
+     * @param int $id ID de l'épreuve à modifier
+     * @param array $data Les nouvelles données de l'épreuve
+     * @return Epreuve|null L'épreuve modifiée ou null en cas d'échec
+     */
+    public function edit(int $id, array $data): ?Epreuve {
         try {
             // Vérifier d'abord si l'épreuve existe
-            $existingEpreuve = $this->getById($id);
+            $existingEpreuve = $this->epreuveRepository->getById($id);
+            
             if (!$existingEpreuve) {
-                error_log("Tentative de modification d'une épreuve inexistante (ID: $id)");
-                return false;
+                error_log("Tentative de mise à jour d'une épreuve inexistante (ID: $id)");
+                return null;
             }
             
-            // Préparer et exécuter la requête de mise à jour
-            $stmt = $this->pdo->prepare("
-                UPDATE epreuve 
-                SET nom = ?, type = ?, id_examen = ? 
-                WHERE id = ?
-            ");
+            // Mettre à jour les propriétés de l'épreuve existante
+            if (isset($data['nom'])) {
+                $existingEpreuve->setNom($data['nom']);
+            }
+            if (isset($data['type'])) {
+                $existingEpreuve->setType($data['type']);
+            }
+            if (isset($data['id_examen'])) {
+                $existingEpreuve->setIdExamen($data['id_examen']);
+            }
             
-            $result = $stmt->execute([
-                $epreuve->getNom(),
-                $epreuve->getType(),
-                $epreuve->getIdExamen(),
-                $id
-            ]);
+            // Utiliser le repository pour la mise à jour
+            return $this->epreuveRepository->update($existingEpreuve);
             
-            // Vérifier si la mise à jour a affecté des lignes
-            return $result && $stmt->rowCount() > 0;
-            
-        } catch (\PDOException $e) {
+        } catch (\Exception $e) {
             error_log("Erreur lors de la mise à jour de l'épreuve (ID: $id): " . $e->getMessage());
-            return false;
+            return null;
         }
     }
 
-    // 4. Supprimer une épreuve
+    /**
+     * Supprime une épreuve
+     * 
+     * @param int $id ID de l'épreuve à supprimer
+     * @return bool True si la suppression a réussi, false sinon
+     */
     public function delete(int $id): bool {
-        $stmt = $this->pdo->prepare("DELETE FROM epreuve WHERE id = ?");
-        return $stmt->execute([$id]);
+        return $this->epreuveRepository->delete($id);
     }
 }

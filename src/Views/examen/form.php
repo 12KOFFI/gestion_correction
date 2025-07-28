@@ -2,16 +2,15 @@
 // Chargement de l'autoloader Composer
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-// Importation des classes nécessaires
-use App\Config\Database;
+// Importation du contrôleur nécessaire
 use App\Controllers\ExamenController;
-use App\Models\Examen;
 
 // Initialisation
 $controller = new ExamenController();
-$examen = new Examen(null, '');
+$examen = null;
 $isEdit = false;
 $error = '';
+$message = '';
 
 // Traitement du formulaire
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -19,7 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nom = trim($_POST['nom'] ?? '');
     
     try {
-        $examen = new Examen($id, $nom);
         $isEdit = ($id !== null);
         
         // Validation des champs obligatoires
@@ -27,15 +25,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception('Le nom de l\'examen est obligatoire');
         }
         
-        // Création ou mise à jour
+        // Création ou mise à jour via le contrôleur
         if ($isEdit) {
-            $success = $controller->edit($id, $examen);
-            if (!$success) {
+            $examen = $controller->edit($id, ['nom' => $nom]);
+            if (!$examen) {
                 throw new Exception('Échec de la mise à jour de l\'examen. Vérifiez que l\'examen existe.');
             }
             $message = 'Examen mis à jour avec succès';
         } else {
-            $examen = $controller->new($examen);
+            $examen = $controller->new(['nom' => $nom]);
             $message = 'Examen créé avec succès';
         }
         
