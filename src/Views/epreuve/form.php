@@ -97,9 +97,9 @@ if (isset($_GET['id'])) {
 // Configuration de la page
 $title = $isEdit ? 'Modifier une épreuve' : 'Ajouter une épreuve';
 
-// En-tête
-require_once __DIR__ . '/../layout/header.php';
 ?>
+
+<?php ob_start(); ?>
 
 <div class="container mt-4">
     <div class="row justify-content-center">
@@ -227,4 +227,6 @@ require_once __DIR__ . '/../layout/header.php';
 })()
 </script>
 
-<?php require_once __DIR__ . '/../layout/footer.php'; ?>
+<?php $content = ob_get_clean(); ?>
+
+<?php require_once __DIR__ . '/../template/layout.php'; ?>

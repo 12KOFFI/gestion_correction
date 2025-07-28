@@ -29,9 +29,9 @@ $epreuves = $controller->index();
 // var_dump($epreuves);
 // echo "</pre>";
 
-// En-tête
-require_once __DIR__ . '/../layout/header.php';
 ?>
+
+<?php ob_start(); ?>
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -97,4 +97,7 @@ require_once __DIR__ . '/../layout/header.php';
     </div>
 </div>
 
-<?php require_once __DIR__ . '/../layout/footer.php'; ?>
+<?php $content = ob_get_clean(); ?>
+
+<?php require_once __DIR__ . '/../template/layout.php'; ?>
+

@@ -94,10 +94,10 @@ try {
         exit();
     }
 }
-
-// En-tête
-require_once __DIR__ . '/../layout/header.php';
 ?>
+
+
+<?php ob_start(); ?>
 
 <div class="container py-4">
     <h2><?= $correction ? 'Modifier une Correction' : 'Nouvelle Correction' ?></h2>
@@ -185,4 +185,7 @@ require_once __DIR__ . '/../layout/header.php';
     </form>
 </div>
 
-<?php require_once __DIR__ . '/../layout/footer.php'; ?>
+<?php $content = ob_get_clean(); ?>
+
+<?php require_once __DIR__ . '/../template/layout.php'; ?>
+

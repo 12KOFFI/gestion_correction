@@ -24,9 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // Récupération de la liste
 $etablissements = $controller->index();
 
-// En-tête
-require_once __DIR__ . '/../layout/header.php';
 ?>
+
+<?php ob_start(); ?>
 
 <div class="container">
     <h1 class="mb-4">Liste des établissements</h1>
@@ -101,4 +101,7 @@ require_once __DIR__ . '/../layout/header.php';
     </div>
 </div> <!-- Fin du container -->
 
-<?php require_once __DIR__ . '/../layout/footer.php'; ?>
+<?php $content = ob_get_clean(); ?>
+
+<?php require_once __DIR__ . '/../template/layout.php'; ?>
+

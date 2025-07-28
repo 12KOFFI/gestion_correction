@@ -77,8 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $etablissements = $etablissementController->index();
 
 // Inclusion du header
-require_once __DIR__ . '/../layout/header.php';
-?>
+ob_start(); ?>
 
 <div class="container py-4">
     <div class="row justify-content-center">
@@ -155,7 +154,6 @@ require_once __DIR__ . '/../layout/header.php';
     </div>
 </div>
 
-<?php 
-// Inclusion du footer
-require_once __DIR__ . '/../layout/footer.php'; 
-?>
+<?php $content = ob_get_clean(); ?>
+
+<?php require_once __DIR__ . '/../template/layout.php'; ?>

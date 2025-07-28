@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
 // Inclusion du header
-require_once __DIR__ . '/../layout/header.php'; 
+ob_start(); 
 ?>
 
 <div class="container py-5">
@@ -82,7 +82,6 @@ require_once __DIR__ . '/../layout/header.php';
     </div>
 </div>
 
-<?php 
-// Inclusion du footer
-require_once __DIR__ . '/../layout/footer.php'; 
-?>
+<?php $content = ob_get_clean(); ?>
+
+<?php require_once __DIR__ . '/../template/layout.php'; ?>

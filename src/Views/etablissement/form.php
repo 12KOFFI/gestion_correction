@@ -49,10 +49,10 @@ if (isset($_GET['id'])) {
 // Configuration de la page
 $pageTitle = $isEdit ? 'Modifier un établissement' : 'Ajouter un établissement';
 
-// En-tête
-require_once __DIR__ . '/../layout/header.php';
 
 // Affichage des messages
+ob_start();
+
 if (!empty($error)) {
     echo '<div class="alert alert-danger">' . htmlspecialchars($error) . '</div>';
 }
@@ -89,4 +89,7 @@ if (!empty($error)) {
     </form>
 </div> <!-- Fin du container -->
 
-<?php require_once __DIR__ . '/../layout/footer.php'; ?>
+<?php $content = ob_get_clean(); ?>
+
+<?php require_once __DIR__ . '/../template/layout.php'; ?>
+
