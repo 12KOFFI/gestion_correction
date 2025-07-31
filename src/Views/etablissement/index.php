@@ -2,10 +2,8 @@
 // Chargement de l'autoloader Composer
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
-// Importation des classes nécessaires
-use App\Config\Database;
 use App\Controllers\EtablissementController;
-use App\Models\Etablissement;
+
 
 // Initialisation
 $controller = new EtablissementController();
@@ -21,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     exit();
 }
 
-// Récupération de la liste
+// Récupération de la liste des établissements
 $etablissements = $controller->index();
 
 ?>

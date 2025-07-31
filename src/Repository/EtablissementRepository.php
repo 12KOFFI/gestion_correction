@@ -52,12 +52,6 @@ class EtablissementRepository {
                 $row['ville']
             );
             
-            // Compter le nombre de professeurs pour chaque établissement
-            $countStmt = $this->pdo->prepare("SELECT COUNT(*) as nb_professeurs FROM professeur WHERE id_etab = ?");
-            $countStmt->execute([$row['id']]);
-            $count = $countStmt->fetch(PDO::FETCH_ASSOC);
-            
-            $etablissement->setNbProfesseurs((int)$count['nb_professeurs']);
             $etablissements[] = $etablissement;
         }
 

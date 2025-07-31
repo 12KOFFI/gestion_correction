@@ -9,7 +9,7 @@ class ProfesseurController {
     private $professeurRepository;
 
     public function __construct() {
-        $this->professeurRepository = new ProfesseurRepository();
+    $this->professeurRepository = new ProfesseurRepository();
     }
 
     /**

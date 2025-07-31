@@ -7,7 +7,6 @@ class Etablissement extends BaseModel {
     private ?int $id;
     private string $nom;
     private string $ville;
-    private int $nb_professeurs = 0;
 
     public function __construct(
         ?int $id = null,
@@ -43,14 +42,5 @@ class Etablissement extends BaseModel {
 
     public function setVille(string $ville): void {
         $this->ville = $ville;
-    }
-    
-    // Getter et setter pour nb_professeurs
-    public function getNbProfesseurs(): int {
-        return $this->nb_professeurs;
-    }
-    
-    public function setNbProfesseurs(int $nb_professeurs): void {
-        $this->nb_professeurs = $nb_professeurs;
     }
 }
